@@ -249,6 +249,7 @@ def generate_coordinates_260(tile):
 
     x_y_max = int(math.pow(2, tile.z)) - 1
 
+    # NOTE: using a north, east, south, west naming scheme
     # top row placement positions
     loc_nw, loc_n, loc_ne = (0, 0), (2, 0), (258, 0)
     # mid row placement positions
@@ -369,90 +370,100 @@ def generate_coordinates_516(tile):
 
     """
 
-    # TODO check that we haven't gone off the grid and omit those tiles
+    tile_coordinates = []
 
     # pre-bump the coordinates to the next highest zoom
     z = tile.z + 1
     x = tile.x * 2
     y = tile.y * 2
 
+    x_y_max = int(math.pow(2, z)) - 1
+
     # see ImageSpec description above for coordinate meaning
 
-    tile_coordinates = (
+    # NOTE: using a row/col scheme to organize the values
 
-        # First row
-        TileCoordinates(
-            Tile(z, x-1, y-1),
-            ImageSpec((0, 0), (254, 254, 256, 256))
-        ),
-        TileCoordinates(
-            Tile(z, x, y-1),
-            ImageSpec((2, 0), (0, 254, 256, 256))
-        ),
-        TileCoordinates(
-            Tile(z, x+1, y-1),
-            ImageSpec((258, 0), (0, 254, 256, 256))
-        ),
-        TileCoordinates(
-            Tile(z, x+2, y-1),
-            ImageSpec((514, 0), (0, 254, 2, 256))
-        ),
-
-        # Second row
-        TileCoordinates(
-            Tile(z, x-1, y),
-            ImageSpec((0, 2), (254, 0, 256, 256))
-        ),
-        TileCoordinates(
-            Tile(z, x, y),
-            ImageSpec((2, 2), None)
-        ),
-        TileCoordinates(
-            Tile(z, x+1, y),
-            ImageSpec((258, 2), None)
-        ),
-        TileCoordinates(
-            Tile(z, x+2, y),
-            ImageSpec((514, 2), (0, 0, 2, 256))
-        ),
-
-        # Third row
-        TileCoordinates(
-            Tile(z, x-1, y+1),
-            ImageSpec((0, 258), (254, 0, 256, 256))
-        ),
-        TileCoordinates(
-            Tile(z, x, y+1),
-            ImageSpec((2, 258), None)
-        ),
-        TileCoordinates(
-            Tile(z, x+1, y+1),
-            ImageSpec((258, 258), None)
-        ),
-        TileCoordinates(
-            Tile(z, x+2, y+1),
-            ImageSpec((514, 258), (0, 0, 2, 256))
-        ),
-
-        # Fourth row
-        TileCoordinates(
-            Tile(z, x-1, y+2),
-            ImageSpec((0, 514), (254, 0, 256, 2))
-        ),
-        TileCoordinates(
-            Tile(z, x, y+2),
-            ImageSpec((2, 514), (0, 0, 256, 2))
-        ),
-        TileCoordinates(
-            Tile(z, x+1, y+2),
-            ImageSpec((258, 514), (0, 0, 256, 2))
-        ),
-        TileCoordinates(
-            Tile(z, x+2, y+2),
-            ImageSpec((514, 514), (0, 0, 2, 2))
-        ),
-
+    # these are the origin locations where the images will be placed
+    locations = (
+        # first row
+        (0, 0), (2, 0), (258, 0), (514, 0),
+        # second row
+        (0, 2), (2, 2), (258, 2), (514, 2),
+        # third row
+        (0, 258), (2, 258), (258, 258), (514, 258),
+        # fourth row
+        (0, 514), (2, 514), (258, 514), (514, 514),
     )
+
+    # set the row tiles to account for edge cases
+    tiles = []
+    for y_iter in xrange(y-1, y+3):
+
+        if y_iter < 0:
+            y_val = 0
+        elif y_iter > x_y_max:
+            y_val = x_y_max
+        else:
+            y_val = y_iter
+
+        for x_iter in xrange(x-1, x+3):
+
+            x_val = x_iter
+            if x_iter < 0:
+                x_val = x_y_max
+            elif x_iter > x_y_max:
+                x_val = 0
+
+            tiles.append(Tile(z, x_val, y_val))
+
+    assert(len(tiles) == 16)
+
+    # set the crop bounds for each
+    if y == 0:
+        top_row_crop_bounds = (
+            (254, 0, 256, 2),
+            (0, 0, 256, 2),
+            (0, 0, 256, 2),
+            (0, 0, 2, 2),
+        )
+    else:
+        top_row_crop_bounds = (
+            (254, 254, 256, 256),
+            (0, 254, 256, 256),
+            (0, 254, 256, 256),
+            (0, 254, 2, 256),
+        )
+    mid_rows_crop_bounds = (
+        (254, 0, 256, 256),
+        None,
+        None,
+        (0, 0, 2, 256),
+    )
+    if y+1 == x_y_max:
+        bot_row_crop_bounds = (
+            (254, 254, 256, 256),
+            (0, 254, 256, 256),
+            (0, 254, 256, 256),
+            (0, 254, 2, 256),
+        )
+    else:
+        bot_row_crop_bounds = (
+            (254, 0, 256, 2),
+            (0, 0, 256, 2),
+            (0, 0, 256, 2),
+            (0, 0, 2, 2),
+        )
+
+    all_crop_bounds = (
+        list(top_row_crop_bounds) +
+        list(mid_rows_crop_bounds) +
+        list(mid_rows_crop_bounds) +
+        list(bot_row_crop_bounds))
+
+    for tile, loc, crop_bounds in zip(tiles, locations, all_crop_bounds):
+        tc = TileCoordinates(tile, ImageSpec(loc, crop_bounds))
+        tile_coordinates.append(tc)
+
     return tile_coordinates
 
 
