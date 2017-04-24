@@ -17,6 +17,155 @@ class CoordsGeneratorTest(unittest.TestCase):
         ]
         self.assertEquals(exp_coords, just_tile_coords)
 
+    def test_260(self):
+        from pngcombiner import Tile
+        from pngcombiner import generate_coordinates_260
+        tile = Tile(2, 1, 1)
+        all_coords = generate_coordinates_260(tile)
+        just_tile_coords = [x.tile for x in all_coords]
+        exp_coords = [
+            Tile(2, 0, 0), Tile(2, 1, 0), Tile(2, 2, 0),
+            Tile(2, 0, 1), Tile(2, 1, 1), Tile(2, 2, 1),
+            Tile(2, 0, 2), Tile(2, 1, 2), Tile(2, 2, 2),
+        ]
+        self.assertEquals(exp_coords, just_tile_coords)
+
+    def test_516(self):
+        from pngcombiner import Tile
+        from pngcombiner import generate_coordinates_516
+        tile = Tile(2, 1, 1)
+        all_coords = generate_coordinates_516(tile)
+        just_tile_coords = [x.tile for x in all_coords]
+        exp_coords = [
+            Tile(3, 1, 1), Tile(3, 2, 1), Tile(3, 3, 1), Tile(3, 4, 1),
+            Tile(3, 1, 2), Tile(3, 2, 2), Tile(3, 3, 2), Tile(3, 4, 2),
+            Tile(3, 1, 3), Tile(3, 2, 3), Tile(3, 3, 3), Tile(3, 4, 3),
+            Tile(3, 1, 4), Tile(3, 2, 4), Tile(3, 3, 4), Tile(3, 4, 4),
+        ]
+        self.assertEquals(exp_coords, just_tile_coords)
+
+    def test_edge_260_topleft(self):
+        from pngcombiner import Tile
+        from pngcombiner import generate_coordinates_260
+        tile = Tile(2, 0, 0)
+        all_coords = generate_coordinates_260(tile)
+        nw, n, ne, w, c, e, sw, s, se = all_coords
+        self.assertEquals(nw.tile, Tile(2, 3, 0))
+        self.assertEquals(n.tile, Tile(2, 0, 0))
+        self.assertEquals(ne.tile, Tile(2, 1, 0))
+        self.assertEquals(w.tile, Tile(2, 3, 0))
+        self.assertEquals(c.tile, Tile(2, 0, 0))
+        self.assertEquals(e.tile, Tile(2, 1, 0))
+        self.assertEquals(nw.image_spec.crop_bounds, (254, 0, 256, 2))
+        self.assertEquals(n.image_spec.crop_bounds, (0, 0, 256, 2))
+        self.assertEquals(ne.image_spec.crop_bounds, (0, 0, 2, 2))
+
+    def test_edge_260_topmid(self):
+        from pngcombiner import Tile
+        from pngcombiner import generate_coordinates_260
+        tile = Tile(2, 1, 0)
+        all_coords = generate_coordinates_260(tile)
+        nw, n, ne, w, c, e, sw, s, se = all_coords
+        self.assertEquals(nw.tile, Tile(2, 0, 0))
+        self.assertEquals(n.tile, Tile(2, 1, 0))
+        self.assertEquals(ne.tile, Tile(2, 2, 0))
+        self.assertEquals(w.tile, Tile(2, 0, 0))
+        self.assertEquals(c.tile, Tile(2, 1, 0))
+        self.assertEquals(e.tile, Tile(2, 2, 0))
+        self.assertEquals(nw.image_spec.crop_bounds, (254, 0, 256, 2))
+        self.assertEquals(n.image_spec.crop_bounds, (0, 0, 256, 2))
+        self.assertEquals(ne.image_spec.crop_bounds, (0, 0, 2, 2))
+
+    def test_edge_260_topright(self):
+        from pngcombiner import Tile
+        from pngcombiner import generate_coordinates_260
+        tile = Tile(2, 3, 0)
+        all_coords = generate_coordinates_260(tile)
+        nw, n, ne, w, c, e, sw, s, se = all_coords
+        self.assertEquals(nw.tile, Tile(2, 2, 0))
+        self.assertEquals(n.tile, Tile(2, 3, 0))
+        self.assertEquals(ne.tile, Tile(2, 0, 0))
+        self.assertEquals(w.tile, Tile(2, 2, 0))
+        self.assertEquals(c.tile, Tile(2, 3, 0))
+        self.assertEquals(e.tile, Tile(2, 0, 0))
+        self.assertEquals(nw.image_spec.crop_bounds, (254, 0, 256, 2))
+        self.assertEquals(n.image_spec.crop_bounds, (0, 0, 256, 2))
+        self.assertEquals(ne.image_spec.crop_bounds, (0, 0, 2, 2))
+
+    def test_edge_260_botleft(self):
+        from pngcombiner import Tile
+        from pngcombiner import generate_coordinates_260
+        tile = Tile(2, 0, 3)
+        all_coords = generate_coordinates_260(tile)
+        nw, n, ne, w, c, e, sw, s, se = all_coords
+        self.assertEquals(sw.tile, Tile(2, 3, 3))
+        self.assertEquals(s.tile, Tile(2, 0, 3))
+        self.assertEquals(se.tile, Tile(2, 1, 3))
+        self.assertEquals(w.tile, Tile(2, 3, 3))
+        self.assertEquals(c.tile, Tile(2, 0, 3))
+        self.assertEquals(e.tile, Tile(2, 1, 3))
+        self.assertEquals(sw.image_spec.crop_bounds, (254, 254, 256, 256))
+        self.assertEquals(s.image_spec.crop_bounds, (0, 254, 256, 256))
+        self.assertEquals(se.image_spec.crop_bounds, (0, 254, 2, 256))
+
+    def test_edge_260_botmid(self):
+        from pngcombiner import Tile
+        from pngcombiner import generate_coordinates_260
+        tile = Tile(2, 2, 3)
+        all_coords = generate_coordinates_260(tile)
+        nw, n, ne, w, c, e, sw, s, se = all_coords
+        self.assertEquals(sw.tile, Tile(2, 1, 3))
+        self.assertEquals(s.tile, Tile(2, 2, 3))
+        self.assertEquals(se.tile, Tile(2, 3, 3))
+        self.assertEquals(w.tile, Tile(2, 1, 3))
+        self.assertEquals(c.tile, Tile(2, 2, 3))
+        self.assertEquals(e.tile, Tile(2, 3, 3))
+        self.assertEquals(sw.image_spec.crop_bounds, (254, 254, 256, 256))
+        self.assertEquals(s.image_spec.crop_bounds, (0, 254, 256, 256))
+        self.assertEquals(se.image_spec.crop_bounds, (0, 254, 2, 256))
+
+    def test_edge_260_botright(self):
+        from pngcombiner import Tile
+        from pngcombiner import generate_coordinates_260
+        tile = Tile(2, 3, 3)
+        all_coords = generate_coordinates_260(tile)
+        nw, n, ne, w, c, e, sw, s, se = all_coords
+        self.assertEquals(sw.tile, Tile(2, 2, 3))
+        self.assertEquals(s.tile, Tile(2, 3, 3))
+        self.assertEquals(se.tile, Tile(2, 0, 3))
+        self.assertEquals(w.tile, Tile(2, 2, 3))
+        self.assertEquals(c.tile, Tile(2, 3, 3))
+        self.assertEquals(e.tile, Tile(2, 0, 3))
+        self.assertEquals(sw.image_spec.crop_bounds, (254, 254, 256, 256))
+        self.assertEquals(s.image_spec.crop_bounds, (0, 254, 256, 256))
+        self.assertEquals(se.image_spec.crop_bounds, (0, 254, 2, 256))
+
+    def test_edge_260_midleft(self):
+        from pngcombiner import Tile
+        from pngcombiner import generate_coordinates_260
+        tile = Tile(2, 0, 2)
+        all_coords = generate_coordinates_260(tile)
+        nw, n, ne, w, c, e, sw, s, se = all_coords
+        self.assertEquals(w.tile, Tile(2, 3, 2))
+        self.assertEquals(c.tile, Tile(2, 0, 2))
+        self.assertEquals(e.tile, Tile(2, 1, 2))
+        self.assertEquals(w.image_spec.crop_bounds, (254, 0, 256, 256))
+        self.assertIsNone(c.image_spec.crop_bounds)
+        self.assertEquals(e.image_spec.crop_bounds, (0, 0, 2, 256))
+
+    def test_edge_260_midright(self):
+        from pngcombiner import Tile
+        from pngcombiner import generate_coordinates_260
+        tile = Tile(2, 3, 1)
+        all_coords = generate_coordinates_260(tile)
+        nw, n, ne, w, c, e, sw, s, se = all_coords
+        self.assertEquals(w.tile, Tile(2, 2, 1))
+        self.assertEquals(c.tile, Tile(2, 3, 1))
+        self.assertEquals(e.tile, Tile(2, 0, 1))
+        self.assertEquals(w.image_spec.crop_bounds, (254, 0, 256, 256))
+        self.assertIsNone(c.image_spec.crop_bounds)
+        self.assertEquals(e.image_spec.crop_bounds, (0, 0, 2, 256))
+
 
 class S3FetchTest(unittest.TestCase):
 

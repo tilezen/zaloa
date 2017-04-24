@@ -223,6 +223,7 @@ def generate_coordinates_512(tile):
     dbl_x = tile.x * 2
     dbl_y = tile.y * 2
     # see ImageSpec description above for coordinate meaning
+
     tile_coordinates = (
         TileCoordinates(Tile(zp1, dbl_x, dbl_y), img_pos(0, 0)),
         TileCoordinates(Tile(zp1, dbl_x+1, dbl_y), img_pos(256, 0)),
@@ -242,53 +243,115 @@ def generate_coordinates_260(tile):
 
     """
 
-    # TODO check that we haven't gone off the grid and omit those tiles
-
     # see ImageSpec description above for coordinate meaning
 
-    tile_coordinates = (
-        # top 3 cells
-        TileCoordinates(
-            Tile(tile.z, tile.x-1, tile.y-1),
-            ImageSpec((0, 0), (254, 254, 256, 256))
-        ),
-        TileCoordinates(
-            Tile(tile.z, tile.x, tile.y-1),
-            ImageSpec((2, 0), (0, 254, 256, 256))
-        ),
-        TileCoordinates(
-            Tile(tile.z, tile.x+1, tile.y-1),
-            ImageSpec((258, 0), (0, 254, 2, 256))
-        ),
+    tile_coordinates = []
 
-        # middle 3 cells
-        TileCoordinates(
-            Tile(tile.z, tile.x-1, tile.y),
-            ImageSpec((0, 2), (254, 0, 256, 256))
-        ),
-        TileCoordinates(
-            Tile(tile.z, tile.x, tile.y),
-            ImageSpec((2, 2), None)
-        ),
-        TileCoordinates(
-            Tile(tile.z, tile.x+1, tile.y),
-            ImageSpec((258, 2), (0, 0, 2, 256))
-        ),
+    x_y_max = int(math.pow(2, tile.z)) - 1
 
-        # bottom 3 cells
-        TileCoordinates(
-            Tile(tile.z, tile.x-1, tile.y+1),
-            ImageSpec((0, 258), (254, 0, 256, 2))
-        ),
-        TileCoordinates(
-            Tile(tile.z, tile.x, tile.y+1),
-            ImageSpec((2, 258), (0, 0, 256, 2))
-        ),
-        TileCoordinates(
-            Tile(tile.z, tile.x+1, tile.y+1),
-            ImageSpec((258, 258), (0, 0, 2, 2))
-        ),
+    # top row placement positions
+    loc_nw, loc_n, loc_ne = (0, 0), (2, 0), (258, 0)
+    # mid row placement positions
+    loc_w, loc_c, loc_e = (0, 2), (2, 2), (258, 2)
+    # bot row placement positions
+    loc_sw, loc_s, loc_se = (0, 258), (2, 258), (258, 258)
+
+    # set the top row tiles to account for edge cases
+    top_y = 0 if tile.y == 0 else tile.y-1
+    if tile.x == 0:
+        nw_tile = Tile(tile.z, x_y_max, top_y)
+    else:
+        nw_tile = Tile(tile.z, tile.x-1, top_y)
+    n_tile = Tile(tile.z, tile.x, top_y)
+    if tile.x == x_y_max:
+        ne_tile = Tile(tile.z, 0, top_y)
+    else:
+        ne_tile = Tile(tile.z, tile.x+1, top_y)
+
+    # set the mid row of tiles
+    if tile.x == 0:
+        w_tile = Tile(tile.z, x_y_max, tile.y)
+    else:
+        w_tile = Tile(tile.z, tile.x-1, tile.y)
+    c_tile = Tile(tile.z, tile.x, tile.y)
+    if tile.x == x_y_max:
+        e_tile = Tile(tile.z, 0, tile.y)
+    else:
+        e_tile = Tile(tile.z, tile.x+1, tile.y)
+
+    # set the bot row of tiles
+    bot_y = x_y_max if tile.y == x_y_max else tile.y+1
+    if tile.x == 0:
+        sw_tile = Tile(tile.z, x_y_max, bot_y)
+    else:
+        sw_tile = Tile(tile.z, tile.x-1, bot_y)
+    s_tile = Tile(tile.z, tile.x, bot_y)
+    if tile.x == x_y_max:
+        se_tile = Tile(tile.z, 0, bot_y)
+    else:
+        se_tile = Tile(tile.z, tile.x+1, bot_y)
+
+    # relevant tiles are set appropriately
+    # now we need to figure out the parts that are cropped from each
+    # if we are the top or bot, we need to invert the piece that gets cropped
+    if tile.y == 0:
+        # the tiles will be set to be the top row
+        # we'll be extracting the top bounds from these
+        top_crop_bounds = (
+            (254, 0, 256, 2),
+            (0, 0, 256, 2),
+            (0, 0, 2, 2),
+        )
+    else:
+        # we are not the top row
+        # we'll be extracting the bot bounds from the row above us
+        top_crop_bounds = (
+            (254, 254, 256, 256),
+            (0, 254, 256, 256),
+            (0, 254, 2, 256),
+        )
+    mid_crop_bounds = (
+        (254, 0, 256, 256),
+        None,
+        (0, 0, 2, 256),
     )
+    if tile.y == x_y_max:
+        # the tiles will be set to the bot row
+        # we'll be extrating the bot bounds from these
+        bot_crop_bounds = (
+            (254, 254, 256, 256),
+            (0, 254, 256, 256),
+            (0, 254, 2, 256),
+        )
+    else:
+        # we are not the bot row
+        # we'll be extracting the top bounds from the row below us
+        bot_crop_bounds = (
+            (254, 0, 256, 2),
+            (0, 0, 256, 2),
+            (0, 0, 2, 2),
+        )
+
+    # the tiles, locations, and bounds are now all assembled
+    # weave them together to generate the list of all tile coordinates
+    all_tiles = (
+        nw_tile, n_tile, ne_tile,
+        w_tile, c_tile, e_tile,
+        sw_tile, s_tile, se_tile,
+    )
+    all_locs = (
+        loc_nw, loc_n, loc_ne,
+        loc_w, loc_c, loc_e,
+        loc_sw, loc_s, loc_se,
+    )
+    all_bounds = (list(top_crop_bounds) +
+                  list(mid_crop_bounds) +
+                  list(bot_crop_bounds))
+
+    for tile, loc, crop_bounds in zip(all_tiles, all_locs, all_bounds):
+        tc = TileCoordinates(tile, ImageSpec(loc, crop_bounds))
+        tile_coordinates.append(tc)
+
     return tile_coordinates
 
 
