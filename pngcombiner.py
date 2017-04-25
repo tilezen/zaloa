@@ -97,6 +97,9 @@ def parse_apigateway_path(path):
     except ValueError:
         return invalid_parse_result('Invalid format')
 
+    if fmt != 'png':
+        return invalid_parse_result('Invalid format')
+
     try:
         tileset = Tileset[tileset_name]
     except KeyError:
@@ -556,12 +559,14 @@ def lambda_handler(event, context):
     log(request_state)
 
     # return the appropriate response
-    if status == 404:
-        return 'Status: 404 - %s' % reason_not_found
-    elif status == 500:
-        raise Exception('Status: 500 - %s' % reason_error)
-    else:
+    if status == 200:
         return response
+    else:
+        if status == 404:
+            err = 'Not Found: %s' % reason_not_found
+        else:
+            err = 'Internal Server Error: %s' % reason_error
+        raise Exception(err)
 
 
 def process_tile(coords_generator, tile_fetcher, image_reducer, tile):
