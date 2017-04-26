@@ -475,8 +475,11 @@ def lambda_handler(event, context):
     request_state['timing'] = timing = {}
 
     with time_block(timing, 'total'):
-        # NOTE: this needs to be set as an environment variable in the handler
-        bucket = os.environ['S3_BUCKET']
+
+        # NOTE: these need to be set as staging variables in the
+        # apigateway integration request mapping
+        request_state['env'] = event['env']
+        bucket = event['bucket']
 
         status = 200
         # these will get set conditionally based on the path
