@@ -1,0 +1,7 @@
+dependencies:
+  pre:
+    - pip install -Ur requirements.txt
+    - pip install boto3
+test:
+  override:
+    - python test.py
