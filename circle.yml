@@ -5,3 +5,8 @@ dependencies:
 test:
   override:
     - python test.py
+deployment:
+  master:
+    branch: master
+    commands:
+      - make download-base-zip upload
