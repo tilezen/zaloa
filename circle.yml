@@ -1,9 +1,10 @@
 dependencies:
   pre:
     - pip install -Ur requirements.txt
-    - pip install boto3
+    - pip install -U boto3 flake8
 test:
   override:
+    - flake8 zaloa.py test.py
     - python test.py
 deployment:
   master:
