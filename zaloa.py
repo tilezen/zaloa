@@ -491,9 +491,7 @@ def lambda_handler(event, context):
         # specific parts as parse continues
         request_state['request'] = {}
 
-        # TODO update this once the apigateway change is made
-        # path = request_state['request']['path'] = event['path']
-        path = request_state['request']['path'] = event['tile']
+        path = request_state['request']['path'] = event['path']
 
         parse_result = parse_apigateway_path(path)
         if parse_result.not_found_reason:
