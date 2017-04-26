@@ -4,8 +4,8 @@ import unittest
 class CoordsGeneratorTest(unittest.TestCase):
 
     def test_512(self):
-        from pngcombiner import Tile
-        from pngcombiner import generate_coordinates_512
+        from zaloa import Tile
+        from zaloa import generate_coordinates_512
         tile = Tile(0, 0, 0)
         all_coords = generate_coordinates_512(tile)
         just_tile_coords = [x.tile for x in all_coords]
@@ -18,8 +18,8 @@ class CoordsGeneratorTest(unittest.TestCase):
         self.assertEquals(exp_coords, just_tile_coords)
 
     def test_260(self):
-        from pngcombiner import Tile
-        from pngcombiner import generate_coordinates_260
+        from zaloa import Tile
+        from zaloa import generate_coordinates_260
         tile = Tile(2, 1, 1)
         all_coords = generate_coordinates_260(tile)
         just_tile_coords = [x.tile for x in all_coords]
@@ -31,8 +31,8 @@ class CoordsGeneratorTest(unittest.TestCase):
         self.assertEquals(exp_coords, just_tile_coords)
 
     def test_516(self):
-        from pngcombiner import Tile
-        from pngcombiner import generate_coordinates_516
+        from zaloa import Tile
+        from zaloa import generate_coordinates_516
         tile = Tile(2, 1, 1)
         all_coords = generate_coordinates_516(tile)
         just_tile_coords = [x.tile for x in all_coords]
@@ -45,8 +45,8 @@ class CoordsGeneratorTest(unittest.TestCase):
         self.assertEquals(exp_coords, just_tile_coords)
 
     def test_edge_260_topleft(self):
-        from pngcombiner import Tile
-        from pngcombiner import generate_coordinates_260
+        from zaloa import Tile
+        from zaloa import generate_coordinates_260
         tile = Tile(2, 0, 0)
         all_coords = generate_coordinates_260(tile)
         nw, n, ne, w, c, e, sw, s, se = all_coords
@@ -61,8 +61,8 @@ class CoordsGeneratorTest(unittest.TestCase):
         self.assertEquals(ne.image_spec.crop_bounds, (0, 0, 2, 2))
 
     def test_edge_260_topmid(self):
-        from pngcombiner import Tile
-        from pngcombiner import generate_coordinates_260
+        from zaloa import Tile
+        from zaloa import generate_coordinates_260
         tile = Tile(2, 1, 0)
         all_coords = generate_coordinates_260(tile)
         nw, n, ne, w, c, e, sw, s, se = all_coords
@@ -77,8 +77,8 @@ class CoordsGeneratorTest(unittest.TestCase):
         self.assertEquals(ne.image_spec.crop_bounds, (0, 0, 2, 2))
 
     def test_edge_260_topright(self):
-        from pngcombiner import Tile
-        from pngcombiner import generate_coordinates_260
+        from zaloa import Tile
+        from zaloa import generate_coordinates_260
         tile = Tile(2, 3, 0)
         all_coords = generate_coordinates_260(tile)
         nw, n, ne, w, c, e, sw, s, se = all_coords
@@ -93,8 +93,8 @@ class CoordsGeneratorTest(unittest.TestCase):
         self.assertEquals(ne.image_spec.crop_bounds, (0, 0, 2, 2))
 
     def test_edge_260_botleft(self):
-        from pngcombiner import Tile
-        from pngcombiner import generate_coordinates_260
+        from zaloa import Tile
+        from zaloa import generate_coordinates_260
         tile = Tile(2, 0, 3)
         all_coords = generate_coordinates_260(tile)
         nw, n, ne, w, c, e, sw, s, se = all_coords
@@ -109,8 +109,8 @@ class CoordsGeneratorTest(unittest.TestCase):
         self.assertEquals(se.image_spec.crop_bounds, (0, 254, 2, 256))
 
     def test_edge_260_botmid(self):
-        from pngcombiner import Tile
-        from pngcombiner import generate_coordinates_260
+        from zaloa import Tile
+        from zaloa import generate_coordinates_260
         tile = Tile(2, 2, 3)
         all_coords = generate_coordinates_260(tile)
         nw, n, ne, w, c, e, sw, s, se = all_coords
@@ -125,8 +125,8 @@ class CoordsGeneratorTest(unittest.TestCase):
         self.assertEquals(se.image_spec.crop_bounds, (0, 254, 2, 256))
 
     def test_edge_260_botright(self):
-        from pngcombiner import Tile
-        from pngcombiner import generate_coordinates_260
+        from zaloa import Tile
+        from zaloa import generate_coordinates_260
         tile = Tile(2, 3, 3)
         all_coords = generate_coordinates_260(tile)
         nw, n, ne, w, c, e, sw, s, se = all_coords
@@ -141,8 +141,8 @@ class CoordsGeneratorTest(unittest.TestCase):
         self.assertEquals(se.image_spec.crop_bounds, (0, 254, 2, 256))
 
     def test_edge_260_midleft(self):
-        from pngcombiner import Tile
-        from pngcombiner import generate_coordinates_260
+        from zaloa import Tile
+        from zaloa import generate_coordinates_260
         tile = Tile(2, 0, 2)
         all_coords = generate_coordinates_260(tile)
         nw, n, ne, w, c, e, sw, s, se = all_coords
@@ -154,8 +154,8 @@ class CoordsGeneratorTest(unittest.TestCase):
         self.assertEquals(e.image_spec.crop_bounds, (0, 0, 2, 256))
 
     def test_edge_260_midright(self):
-        from pngcombiner import Tile
-        from pngcombiner import generate_coordinates_260
+        from zaloa import Tile
+        from zaloa import generate_coordinates_260
         tile = Tile(2, 3, 1)
         all_coords = generate_coordinates_260(tile)
         nw, n, ne, w, c, e, sw, s, se = all_coords
@@ -167,8 +167,8 @@ class CoordsGeneratorTest(unittest.TestCase):
         self.assertEquals(e.image_spec.crop_bounds, (0, 0, 2, 256))
 
     def test_edge_516_topleft(self):
-        from pngcombiner import Tile
-        from pngcombiner import generate_coordinates_516
+        from zaloa import Tile
+        from zaloa import generate_coordinates_516
         tile = Tile(2, 0, 0)
         coords = generate_coordinates_516(tile)
         self.assertEquals(coords[0].tile, Tile(3, 7, 0))
@@ -185,8 +185,8 @@ class CoordsGeneratorTest(unittest.TestCase):
         self.assertEquals(coords[3].image_spec.crop_bounds, (0, 0, 2, 2))
 
     def test_edge_516_topmid(self):
-        from pngcombiner import Tile
-        from pngcombiner import generate_coordinates_516
+        from zaloa import Tile
+        from zaloa import generate_coordinates_516
         tile = Tile(2, 2, 0)
         coords = generate_coordinates_516(tile)
         self.assertEquals(coords[0].tile, Tile(3, 3, 0))
@@ -203,8 +203,8 @@ class CoordsGeneratorTest(unittest.TestCase):
         self.assertEquals(coords[3].image_spec.crop_bounds, (0, 0, 2, 2))
 
     def test_edge_516_topright(self):
-        from pngcombiner import Tile
-        from pngcombiner import generate_coordinates_516
+        from zaloa import Tile
+        from zaloa import generate_coordinates_516
         tile = Tile(2, 3, 0)
         coords = generate_coordinates_516(tile)
         self.assertEquals(coords[0].tile, Tile(3, 5, 0))
@@ -225,8 +225,8 @@ class CoordsGeneratorTest(unittest.TestCase):
         self.assertEquals(coords[3].image_spec.crop_bounds, (0, 0, 2, 2))
 
     def test_edge_516_midleft(self):
-        from pngcombiner import Tile
-        from pngcombiner import generate_coordinates_516
+        from zaloa import Tile
+        from zaloa import generate_coordinates_516
         tile = Tile(2, 0, 3)
         coords = generate_coordinates_516(tile)
         self.assertEquals(coords[4].tile, Tile(3, 7, 6))
@@ -247,8 +247,8 @@ class CoordsGeneratorTest(unittest.TestCase):
         self.assertEquals(coords[11].image_spec.crop_bounds, (0, 0, 2, 256))
 
     def test_edge_516_midright(self):
-        from pngcombiner import Tile
-        from pngcombiner import generate_coordinates_516
+        from zaloa import Tile
+        from zaloa import generate_coordinates_516
         tile = Tile(2, 3, 2)
         coords = generate_coordinates_516(tile)
         self.assertEquals(coords[4].tile, Tile(3, 5, 4))
@@ -269,8 +269,8 @@ class CoordsGeneratorTest(unittest.TestCase):
         self.assertEquals(coords[11].image_spec.crop_bounds, (0, 0, 2, 256))
 
     def test_edge_516_botleft(self):
-        from pngcombiner import Tile
-        from pngcombiner import generate_coordinates_516
+        from zaloa import Tile
+        from zaloa import generate_coordinates_516
         tile = Tile(2, 0, 3)
         coords = generate_coordinates_516(tile)
         self.assertEquals(coords[8].tile, Tile(3, 7, 7))
@@ -291,8 +291,8 @@ class CoordsGeneratorTest(unittest.TestCase):
                           (0, 254, 2, 256))
 
     def test_edge_516_botmid(self):
-        from pngcombiner import Tile
-        from pngcombiner import generate_coordinates_516
+        from zaloa import Tile
+        from zaloa import generate_coordinates_516
         tile = Tile(2, 1, 3)
         coords = generate_coordinates_516(tile)
         self.assertEquals(coords[8].tile, Tile(3, 1, 7))
@@ -313,8 +313,8 @@ class CoordsGeneratorTest(unittest.TestCase):
                           (0, 254, 2, 256))
 
     def test_edge_516_botright(self):
-        from pngcombiner import Tile
-        from pngcombiner import generate_coordinates_516
+        from zaloa import Tile
+        from zaloa import generate_coordinates_516
         tile = Tile(2, 3, 3)
         coords = generate_coordinates_516(tile)
         self.assertEquals(coords[8].tile, Tile(3, 5, 7))
@@ -348,13 +348,13 @@ class S3FetchTest(unittest.TestCase):
                     Body=StringIO('image data'),
                 )
 
-        from pngcombiner import S3TileFetcher
+        from zaloa import S3TileFetcher
         bucket = 'fake-bucket'
-        from pngcombiner import Tileset
+        from zaloa import Tileset
         tileset = Tileset.terrarium
         stub_s3_client = StubS3Client()
         s3_tile_fetcher = S3TileFetcher(stub_s3_client, bucket, tileset)
-        from pngcombiner import Tile
+        from zaloa import Tile
         fetch_result = s3_tile_fetcher(Tile(3, 2, 1))
         self.assertEquals('image data', fetch_result.image_bytes)
         self.assertEquals('fake-bucket', stub_s3_client.kwargs['Bucket'])
@@ -377,14 +377,14 @@ class S3FetchTest(unittest.TestCase):
             def get_object(self, **kwargs):
                 raise StubS3Exception('test missing tile')
 
-        from pngcombiner import S3TileFetcher
+        from zaloa import S3TileFetcher
         bucket = 'fake-bucket'
-        from pngcombiner import Tileset
+        from zaloa import Tileset
         tileset = Tileset.terrarium
         stub_s3_client = StubS3Client()
         s3_tile_fetcher = S3TileFetcher(stub_s3_client, bucket, tileset)
-        from pngcombiner import Tile
-        from pngcombiner import MissingTileException
+        from zaloa import Tile
+        from zaloa import MissingTileException
         with self.assertRaises(MissingTileException) as cm:
             s3_tile_fetcher(Tile(3, 2, 1))
         self.assertEquals(Tile(3, 2, 1), cm.exception.tile)
@@ -399,14 +399,14 @@ class S3FetchTest(unittest.TestCase):
             def get_object(self, **kwargs):
                 raise StubS3Exception('unknown exception')
 
-        from pngcombiner import S3TileFetcher
+        from zaloa import S3TileFetcher
         bucket = 'fake-bucket'
-        from pngcombiner import Tileset
+        from zaloa import Tileset
         tileset = Tileset.terrarium
         stub_s3_client = StubS3Client()
         s3_tile_fetcher = S3TileFetcher(stub_s3_client, bucket, tileset)
-        from pngcombiner import Tile
-        from pngcombiner import MissingTileException
+        from zaloa import Tile
+        from zaloa import MissingTileException
         with self.assertRaises(Exception) as cm:
             s3_tile_fetcher(Tile(3, 2, 1))
         self.failIf(isinstance(cm.exception, MissingTileException))
@@ -416,12 +416,12 @@ class S3FetchTest(unittest.TestCase):
 class ProcessTileTest(unittest.TestCase):
 
     def test_basic_invocation(self):
-        from pngcombiner import process_tile
-        from pngcombiner import generate_coordinates_512
-        from pngcombiner import Tile
+        from zaloa import process_tile
+        from zaloa import generate_coordinates_512
+        from zaloa import Tile
 
         def stub_fetch(tile):
-            from pngcombiner import FetchResult
+            from zaloa import FetchResult
             return FetchResult('image data')
 
         class StubImageReducer(object):
@@ -458,16 +458,16 @@ class ProcessTileTest(unittest.TestCase):
         return fp.getvalue()
 
     def test_validity_512(self):
-        from pngcombiner import process_tile
-        from pngcombiner import generate_coordinates_512
-        from pngcombiner import Tile
+        from zaloa import process_tile
+        from zaloa import generate_coordinates_512
+        from zaloa import Tile
 
         def stub_fetch(tile):
             # return back
             # r g
             # b w
             # oriented around test coordinate of 2/1/1
-            from pngcombiner import FetchResult
+            from zaloa import FetchResult
             if tile == Tile(3, 2, 2):
                 # nw
                 color = 255, 0, 0
@@ -485,7 +485,7 @@ class ProcessTileTest(unittest.TestCase):
             image_bytes = self._gen_stub_image(color)
             return FetchResult(image_bytes)
 
-        from pngcombiner import ImageReducer
+        from zaloa import ImageReducer
         image_reducer = ImageReducer(512)
 
         image_bytes, metadata = process_tile(
@@ -517,9 +517,9 @@ class ProcessTileTest(unittest.TestCase):
                     self.assertEquals(color, pixel)
 
     def test_validity_260(self):
-        from pngcombiner import process_tile
-        from pngcombiner import generate_coordinates_260
-        from pngcombiner import Tile
+        from zaloa import process_tile
+        from zaloa import generate_coordinates_260
+        from zaloa import Tile
 
         def stub_fetch(tile):
             # return back
@@ -527,7 +527,7 @@ class ProcessTileTest(unittest.TestCase):
             # g w g
             # b b b
             # oriented around test coordinate of 2/1/1
-            from pngcombiner import FetchResult
+            from zaloa import FetchResult
             if tile in (Tile(2, 0, 0), Tile(2, 1, 0), Tile(2, 2, 0)):
                 # top row
                 color = 255, 0, 0
@@ -545,7 +545,7 @@ class ProcessTileTest(unittest.TestCase):
             image_bytes = self._gen_stub_image(color)
             return FetchResult(image_bytes)
 
-        from pngcombiner import ImageReducer
+        from zaloa import ImageReducer
         image_reducer = ImageReducer(260)
 
         image_bytes, metadata = process_tile(
@@ -586,12 +586,12 @@ class ProcessTileTest(unittest.TestCase):
                     self.assertEquals(color, pixel)
 
     def test_validity_516(self):
-        from pngcombiner import process_tile
-        from pngcombiner import generate_coordinates_516
-        from pngcombiner import Tile
+        from zaloa import process_tile
+        from zaloa import generate_coordinates_516
+        from zaloa import Tile
 
         def stub_fetch(tile):
-            from pngcombiner import FetchResult
+            from zaloa import FetchResult
 
             # return back
             # r r r r
@@ -628,7 +628,7 @@ class ProcessTileTest(unittest.TestCase):
             image_bytes = self._gen_stub_image(color)
             return FetchResult(image_bytes)
 
-        from pngcombiner import ImageReducer
+        from zaloa import ImageReducer
         image_reducer = ImageReducer(516)
 
         image_bytes, metadata = process_tile(

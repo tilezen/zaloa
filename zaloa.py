@@ -9,7 +9,6 @@ import base64
 import boto3
 import json
 import math
-import os
 
 
 def is_tile_valid(z, x, y):
