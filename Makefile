@@ -16,4 +16,7 @@ build-base-zip:
 upload-base-zip: zaloa.zip
 	aws s3 cp zaloa.zip s3://mapzen.software/tile/zaloa/lambda-base.zip
 
+clean:
+	rm -rf zaloa.zip env
+
 .PHONY: zip download-base-zip build-base-zip upload-base-zip

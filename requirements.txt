@@ -1,0 +1,5 @@
+Pillow==4.1.0
+argparse==1.2.1
+enum34==1.1.6
+olefile==0.44
+wsgiref==0.1.2
