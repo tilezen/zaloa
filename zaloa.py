@@ -86,7 +86,7 @@ def invalid_parse_result(reason):
 def parse_apigateway_path(path):
     path_parts = path.split('/')
     try:
-        tileset_name, tilesize_str, z_s, x_s, y_fmt = path_parts
+        tilesize_str, tileset_name, z_s, x_s, y_fmt = path_parts
     except ValueError:
         return invalid_parse_result('Invalid url path')
 
