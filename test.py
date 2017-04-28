@@ -505,10 +505,10 @@ class ProcessTileTest(unittest.TestCase):
         # sw -> blue
         # se -> white
         expectations = (
-            ((0, 0, 256, 256), (255, 0, 0)),
-            ((256, 0, 512, 256), (0, 255, 0)),
-            ((0, 256, 256, 512), (0, 0, 255)),
-            ((256, 256, 512, 512), (255, 255, 255)),
+            ((0, 0, 256, 256), (255, 0, 0, 255)),
+            ((256, 0, 512, 256), (0, 255, 0, 255)),
+            ((0, 256, 256, 512), (0, 0, 255, 255)),
+            ((256, 256, 512, 512), (255, 255, 255, 255)),
         )
         for region_bounds, color in expectations:
             for y in xrange(region_bounds[1], region_bounds[3]):
@@ -566,18 +566,18 @@ class ProcessTileTest(unittest.TestCase):
         # bottom 2 rows should be blue
         expectations = (
             # top rows red
-            ((0, 0, 260, 2), (255, 0, 0)),
+            ((0, 0, 260, 2), (255, 0, 0, 255)),
 
             # left cols green
-            ((0, 2, 2, 258), (0, 255, 0)),
+            ((0, 2, 2, 258), (0, 255, 0, 255)),
             # right cols green
-            ((258, 2, 260, 258), (0, 255, 0)),
+            ((258, 2, 260, 258), (0, 255, 0, 255)),
 
             # center white
-            ((2, 2, 258, 258), (255, 255, 255)),
+            ((2, 2, 258, 258), (255, 255, 255, 255)),
 
             # bottom rows blue
-            ((0, 258, 260, 260), (0, 0, 255)),
+            ((0, 258, 260, 260), (0, 0, 255, 255)),
         )
         for region_bounds, color in expectations:
             for y in xrange(region_bounds[1], region_bounds[3]):
@@ -649,18 +649,18 @@ class ProcessTileTest(unittest.TestCase):
         # bottom 2 rows should be blue
         expectations = (
             # top rows red
-            ((0, 0, 516, 2), (255, 0, 0)),
+            ((0, 0, 516, 2), (255, 0, 0, 255)),
 
             # left cols green
-            ((0, 2, 2, 514), (0, 255, 0)),
+            ((0, 2, 2, 514), (0, 255, 0, 255)),
             # right cols green
-            ((514, 2, 516, 514), (0, 255, 0)),
+            ((514, 2, 516, 514), (0, 255, 0, 255)),
 
             # center white
-            ((2, 2, 514, 514), (255, 255, 255)),
+            ((2, 2, 514, 514), (255, 255, 255, 255)),
 
             # bottom rows blue
-            ((0, 514, 516, 516), (0, 0, 255)),
+            ((0, 514, 516, 516), (0, 0, 255, 255)),
         )
         for region_bounds, color in expectations:
             for y in xrange(region_bounds[1], region_bounds[3]):

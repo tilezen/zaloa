@@ -177,7 +177,7 @@ class ImageReducer(object):
         assert tilesize in (512, 516, 260)
 
     def create_initial_state(self):
-        image_state = Image.new('RGB', (self.tilesize, self.tilesize))
+        image_state = Image.new('RGBA', (self.tilesize, self.tilesize))
         return image_state
 
     def reduce(self, image_state, image_input):
