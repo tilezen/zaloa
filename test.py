@@ -705,5 +705,6 @@ class ParsePathTest(unittest.TestCase):
         self.assert_not_found('512/terrarium/1/2/2.png',
                               'Invalid tile coordinate')
 
+
 if __name__ == '__main__':
     unittest.main()
