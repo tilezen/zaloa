@@ -122,6 +122,9 @@ def parse_apigateway_path(path):
     except ValueError:
         return invalid_parse_result('Invalid tile coordinate')
 
+    if not is_tile_valid(z, x, y):
+        return invalid_parse_result('Invalid tile coordinate')
+
     tile = Tile(z, x, y)
     parse_result = PathParseResult(None, tileset, tilesize, tile)
     return parse_result

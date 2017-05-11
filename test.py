@@ -669,5 +669,41 @@ class ProcessTileTest(unittest.TestCase):
                     self.assertEquals(color, pixel)
 
 
+class ParsePathTest(unittest.TestCase):
+
+    def test_valid_paths(self):
+        from zaloa import parse_apigateway_path
+
+        def assert_valid_path(path):
+            parse_result = parse_apigateway_path(path)
+            self.assertIsNone(parse_result.not_found_reason)
+
+        assert_valid_path('512/terrarium/1/1/1.png')
+        assert_valid_path('260/terrarium/1/1/1.png')
+        assert_valid_path('516/terrarium/1/1/1.png')
+        assert_valid_path('512/normal/1/1/1.png')
+
+    def assert_not_found(self, path, reason):
+        from zaloa import parse_apigateway_path
+        parse_result = parse_apigateway_path(path)
+        self.assertEquals(reason, parse_result.not_found_reason)
+
+    def test_invalid_tile_format(self):
+        self.assert_not_found('512/terrarium/1/1/1.jpg', 'Invalid format')
+
+    def test_invalid_tilesize(self):
+        self.assert_not_found('200/terrarium/1/1/1.png', 'Invalid tilesize')
+        self.assert_not_found('260/normal/1/1/1.png',
+                              'Normal tiles are unbuffered')
+        self.assert_not_found('516/normal/1/1/1.png',
+                              'Normal tiles are unbuffered')
+
+    def test_invalid_tileset(self):
+        self.assert_not_found('512/foo/1/1/1.png', 'Invalid tileset')
+
+    def test_invalid_tile_coordinates(self):
+        self.assert_not_found('512/terrarium/1/2/2.png',
+                              'Invalid tile coordinate')
+
 if __name__ == '__main__':
     unittest.main()
