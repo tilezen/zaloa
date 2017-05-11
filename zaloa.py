@@ -530,9 +530,11 @@ def lambda_handler(event, context):
                            '%s %s' % (tileset, tilesize)
 
             try:
-                image_bytes, timing_metadata = process_tile(
+                image_bytes, timing_metadata, tile_coords = process_tile(
                     coords_generator, tile_fetcher, image_reducer, tile)
                 request_state['timing'].update(timing_metadata)
+                request_state['source-tiles'] = [
+                    str(x.tile) for x in tile_coords]
 
                 # base 64 encode the response
                 with time_block(timing, 'b64'):
@@ -573,8 +575,6 @@ def lambda_handler(event, context):
 
 
 def process_tile(coords_generator, tile_fetcher, image_reducer, tile):
-    all_tile_coords = coords_generator(tile)
-
     timing_fetch = {}
     timing_process = {}
     timing_metadata = dict(
@@ -586,6 +586,7 @@ def process_tile(coords_generator, tile_fetcher, image_reducer, tile):
 
     # TODO support cache headers for 304 responses?
     with time_block(timing_fetch, 'total'):
+        all_tile_coords = coords_generator(tile)
         for tile_coords in all_tile_coords:
             tile = tile_coords.tile
             with time_block(timing_fetch, str(tile)):
@@ -604,4 +605,4 @@ def process_tile(coords_generator, tile_fetcher, image_reducer, tile):
     with time_block(timing_metadata, 'save'):
         image_bytes = image_reducer.finalize(image_state)
 
-    return image_bytes, timing_metadata
+    return image_bytes, timing_metadata, all_tile_coords

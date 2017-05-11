@@ -437,7 +437,7 @@ class ProcessTileTest(unittest.TestCase):
 
         stub_reducer = StubImageReducer()
 
-        response, metadata = process_tile(
+        response, metadata, tiles = process_tile(
             generate_coordinates_512,
             stub_fetch,
             stub_reducer,
@@ -488,7 +488,7 @@ class ProcessTileTest(unittest.TestCase):
         from zaloa import ImageReducer
         image_reducer = ImageReducer(512)
 
-        image_bytes, metadata = process_tile(
+        image_bytes, metadata, tiles = process_tile(
             generate_coordinates_512,
             stub_fetch,
             image_reducer,
@@ -548,7 +548,7 @@ class ProcessTileTest(unittest.TestCase):
         from zaloa import ImageReducer
         image_reducer = ImageReducer(260)
 
-        image_bytes, metadata = process_tile(
+        image_bytes, metadata, tiles = process_tile(
             generate_coordinates_260,
             stub_fetch,
             image_reducer,
@@ -631,7 +631,7 @@ class ProcessTileTest(unittest.TestCase):
         from zaloa import ImageReducer
         image_reducer = ImageReducer(516)
 
-        image_bytes, metadata = process_tile(
+        image_bytes, metadata, tiles = process_tile(
             generate_coordinates_516,
             stub_fetch,
             image_reducer,
