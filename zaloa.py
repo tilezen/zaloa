@@ -11,6 +11,10 @@ import json
 import math
 
 
+# NOTE: global to cut down on setup time for every request
+s3_client = boto3.client('s3')
+
+
 def is_tile_valid(z, x, y):
     if z < 0 or x < 0 or y < 0:
         return False
@@ -496,7 +500,8 @@ def lambda_handler(event, context):
 
         path = request_state['request']['path'] = event['path']
 
-        parse_result = parse_apigateway_path(path)
+        with time_block(timing, 'parse'):
+            parse_result = parse_apigateway_path(path)
         if parse_result.not_found_reason:
             reason_not_found = parse_result.not_found_reason
             status = 404
@@ -512,7 +517,10 @@ def lambda_handler(event, context):
             tilesize = parse_result.tilesize
             request_state['request']['tilesize'] = tilesize
 
-            s3_client = boto3.client('s3')
+            # NOTE: the s3_client is set up globally at module import
+            # time to cut down on the setup time required for each
+            # function invocation
+            global s3_client
             tile_fetcher = S3TileFetcher(s3_client, bucket, tileset)
             image_reducer = ImageReducer(tilesize)
 
@@ -584,9 +592,11 @@ def process_tile(coords_generator, tile_fetcher, image_reducer, tile):
 
     image_inputs = []
 
+    with time_block(timing_metadata, 'coords-gen'):
+        all_tile_coords = coords_generator(tile)
+
     # TODO support cache headers for 304 responses?
     with time_block(timing_fetch, 'total'):
-        all_tile_coords = coords_generator(tile)
         for tile_coords in all_tile_coords:
             tile = tile_coords.tile
             with time_block(timing_fetch, str(tile)):
