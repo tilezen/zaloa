@@ -9,6 +9,8 @@ import base64
 import boto3
 import json
 import math
+import Queue
+import threading
 
 
 # NOTE: global to cut down on setup time for every request
@@ -54,7 +56,7 @@ class Tile(object):
 Tileset = Enum('Tileset', 'terrarium normal')
 
 # TODO fetchresult can grow to contain response caching headers
-FetchResult = namedtuple('FetchResult', 'image_bytes')
+FetchResult = namedtuple('FetchResult', 'image_bytes tile')
 
 # image specification defines the image placement of the source in the
 # final destination
@@ -159,7 +161,7 @@ class S3TileFetcher(object):
             image_bytes = body_file.read()
             body_file.close()
             # TODO caching response headers
-            return FetchResult(image_bytes)
+            return FetchResult(image_bytes, tile)
         except Exception as e:
             try:
                 err_code = e.response['Error']['Code']
@@ -582,19 +584,8 @@ def lambda_handler(event, context):
         raise Exception(err)
 
 
-def process_tile(coords_generator, tile_fetcher, image_reducer, tile):
-    timing_fetch = {}
-    timing_process = {}
-    timing_metadata = dict(
-        fetch=timing_fetch,
-        process=timing_process,
-    )
-
+def fetch_tiles_single_thread(tile_fetcher, all_tile_coords, timing_fetch):
     image_inputs = []
-
-    with time_block(timing_metadata, 'coords-gen'):
-        all_tile_coords = coords_generator(tile)
-
     # TODO support cache headers for 304 responses?
     with time_block(timing_fetch, 'total'):
         for tile_coords in all_tile_coords:
@@ -605,6 +596,65 @@ def process_tile(coords_generator, tile_fetcher, image_reducer, tile):
             image_input = ImageInput(
                 fetch_result.image_bytes, tile_coords.image_spec, tile)
             image_inputs.append(image_input)
+    return image_inputs
+
+
+def _time_and_fetch(tile_fetcher, tile_coords, timing_fetch, queue):
+    try:
+        with time_block(timing_fetch, str(tile_coords.tile)):
+            fetch_result = tile_fetcher(tile_coords.tile)
+    except Exception as e:
+        fetch_result = e
+    queue.put((fetch_result, tile_coords.image_spec))
+
+
+def fetch_tiles_multi_threaded(tile_fetcher, all_tile_coords, timing_fetch):
+    image_inputs = []
+    threads = []
+    fetch_results_queue = Queue.Queue(len(all_tile_coords))
+    error = None
+    with time_block(timing_fetch, 'total'):
+        for tile_coords in all_tile_coords:
+            thread_args = (
+                tile_fetcher, tile_coords, timing_fetch, fetch_results_queue)
+            t = threading.Thread(
+                target=_time_and_fetch,
+                args=thread_args)
+            t.start()
+            threads.append(t)
+
+        for t in threads:
+            t.join()
+
+        for i in xrange(len(threads)):
+            fetch_result, image_spec = fetch_results_queue.get()
+            if isinstance(fetch_result, Exception):
+                error = fetch_result
+            else:
+                image_input = ImageInput(
+                    fetch_result.image_bytes, image_spec, fetch_result.tile)
+                image_inputs.append(image_input)
+        if error is None:
+            return image_inputs
+        else:
+            raise error
+
+
+def process_tile(coords_generator, tile_fetcher, image_reducer, tile):
+    timing_fetch = {}
+    timing_process = {}
+    timing_metadata = dict(
+        fetch=timing_fetch,
+        process=timing_process,
+    )
+
+    with time_block(timing_metadata, 'coords-gen'):
+        all_tile_coords = coords_generator(tile)
+
+    # image_inputs = fetch_tiles_single_thread(
+    #     tile_fetcher, all_tile_coords, timing_fetch)
+    image_inputs = fetch_tiles_multi_threaded(
+        tile_fetcher, all_tile_coords, timing_fetch)
 
     with time_block(timing_process, 'total'):
         image_state = image_reducer.create_initial_state()

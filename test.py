@@ -422,7 +422,7 @@ class ProcessTileTest(unittest.TestCase):
 
         def stub_fetch(tile):
             from zaloa import FetchResult
-            return FetchResult('image data')
+            return FetchResult('image data', tile)
 
         class StubImageReducer(object):
 
@@ -483,7 +483,7 @@ class ProcessTileTest(unittest.TestCase):
             else:
                 assert not 'Invalid tile coordinate: %s' % tile
             image_bytes = self._gen_stub_image(color)
-            return FetchResult(image_bytes)
+            return FetchResult(image_bytes, tile)
 
         from zaloa import ImageReducer
         image_reducer = ImageReducer(512)
@@ -543,7 +543,7 @@ class ProcessTileTest(unittest.TestCase):
             else:
                 assert not 'Invalid tile coordinate: %s' % tile
             image_bytes = self._gen_stub_image(color)
-            return FetchResult(image_bytes)
+            return FetchResult(image_bytes, tile)
 
         from zaloa import ImageReducer
         image_reducer = ImageReducer(260)
@@ -626,7 +626,7 @@ class ProcessTileTest(unittest.TestCase):
             else:
                 assert not 'Invalid tile coordinate: %s' % tile
             image_bytes = self._gen_stub_image(color)
-            return FetchResult(image_bytes)
+            return FetchResult(image_bytes, tile)
 
         from zaloa import ImageReducer
         image_reducer = ImageReducer(516)
