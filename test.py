@@ -705,6 +705,10 @@ class ParsePathTest(unittest.TestCase):
         self.assert_not_found('512/terrarium/1/2/2.png',
                               'Invalid tile coordinate')
 
+    def test_invalid_tile_coordinate_512(self):
+        self.assert_not_found('512/terrarium/15/1/1.png',
+                              'Invalid zoom')
+
 
 if __name__ == '__main__':
     unittest.main()

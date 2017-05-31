@@ -131,6 +131,9 @@ def parse_apigateway_path(path):
     if not is_tile_valid(z, x, y):
         return invalid_parse_result('Invalid tile coordinate')
 
+    if tilesize != 260 and z == 15:
+        return invalid_parse_result('Invalid zoom')
+
     tile = Tile(z, x, y)
     parse_result = PathParseResult(None, tileset, tilesize, tile)
     return parse_result
