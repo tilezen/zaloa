@@ -118,9 +118,6 @@ def parse_apigateway_path(path):
     if tilesize not in (260, 512, 516):
         return invalid_parse_result('Invalid tilesize')
 
-    if tileset == Tileset.normal and tilesize != 512:
-        return invalid_parse_result('Normal tiles are unbuffered')
-
     try:
         z = int(z_s)
         x = int(x_s)
@@ -529,14 +526,14 @@ def lambda_handler(event, context):
             tile_fetcher = S3TileFetcher(s3_client, bucket, tileset)
             image_reducer = ImageReducer(tilesize)
 
+            # both terrarium and normal tiles follow the same
+            # coordinate generation strategy. They just point to a
+            # different location for the source data
             if tilesize == 512:
-                # both terrarium and normal tiles follow the same
-                # coordinate generation strategy. They just point to a
-                # different location for the source data
                 coords_generator = generate_coordinates_512
-            elif tileset == Tileset.terrarium and tilesize == 260:
+            elif tilesize == 260:
                 coords_generator = generate_coordinates_260
-            elif tileset == Tileset.terrarium and tilesize == 516:
+            elif tilesize == 516:
                 coords_generator = generate_coordinates_516
             else:
                 assert not 'tileset/tilesize combination unimplemented: ' \

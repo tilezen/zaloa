@@ -682,6 +682,8 @@ class ParsePathTest(unittest.TestCase):
         assert_valid_path('260/terrarium/1/1/1.png')
         assert_valid_path('516/terrarium/1/1/1.png')
         assert_valid_path('512/normal/1/1/1.png')
+        assert_valid_path('260/normal/1/1/1.png')
+        assert_valid_path('516/normal/1/1/1.png')
 
     def assert_not_found(self, path, reason):
         from zaloa import parse_apigateway_path
@@ -693,10 +695,7 @@ class ParsePathTest(unittest.TestCase):
 
     def test_invalid_tilesize(self):
         self.assert_not_found('200/terrarium/1/1/1.png', 'Invalid tilesize')
-        self.assert_not_found('260/normal/1/1/1.png',
-                              'Normal tiles are unbuffered')
-        self.assert_not_found('516/normal/1/1/1.png',
-                              'Normal tiles are unbuffered')
+        self.assert_not_found('400/normal/1/1/1.png', 'Invalid tilesize')
 
     def test_invalid_tileset(self):
         self.assert_not_found('512/foo/1/1/1.png', 'Invalid tileset')
