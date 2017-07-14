@@ -353,9 +353,9 @@ class S3FetchTest(unittest.TestCase):
         from zaloa import Tileset
         tileset = Tileset.terrarium
         stub_s3_client = StubS3Client()
-        s3_tile_fetcher = S3TileFetcher(stub_s3_client, bucket, tileset)
+        s3_tile_fetcher = S3TileFetcher(stub_s3_client, bucket)
         from zaloa import Tile
-        fetch_result = s3_tile_fetcher(Tile(3, 2, 1))
+        fetch_result = s3_tile_fetcher(tileset, Tile(3, 2, 1))
         self.assertEquals('image data', fetch_result.image_bytes)
         self.assertEquals('fake-bucket', stub_s3_client.kwargs['Bucket'])
         self.assertEquals('terrarium/3/2/1.png', stub_s3_client.kwargs['Key'])
@@ -382,11 +382,11 @@ class S3FetchTest(unittest.TestCase):
         from zaloa import Tileset
         tileset = Tileset.terrarium
         stub_s3_client = StubS3Client()
-        s3_tile_fetcher = S3TileFetcher(stub_s3_client, bucket, tileset)
+        s3_tile_fetcher = S3TileFetcher(stub_s3_client, bucket)
         from zaloa import Tile
         from zaloa import MissingTileException
         with self.assertRaises(MissingTileException) as cm:
-            s3_tile_fetcher(Tile(3, 2, 1))
+            s3_tile_fetcher(tileset, Tile(3, 2, 1))
         self.assertEquals(Tile(3, 2, 1), cm.exception.tile)
 
     def test_unknown_exception(self):
@@ -404,11 +404,87 @@ class S3FetchTest(unittest.TestCase):
         from zaloa import Tileset
         tileset = Tileset.terrarium
         stub_s3_client = StubS3Client()
-        s3_tile_fetcher = S3TileFetcher(stub_s3_client, bucket, tileset)
+        s3_tile_fetcher = S3TileFetcher(stub_s3_client, bucket)
         from zaloa import Tile
         from zaloa import MissingTileException
         with self.assertRaises(Exception) as cm:
-            s3_tile_fetcher(Tile(3, 2, 1))
+            s3_tile_fetcher(tileset, Tile(3, 2, 1))
+        self.failIf(isinstance(cm.exception, MissingTileException))
+        self.assertEquals('unknown exception', cm.exception.message)
+
+
+class HttpFetchTest(unittest.TestCase):
+
+    def test_success(self):
+
+        class StubHttpResponse(object):
+
+            def __init__(self, status_code, content):
+                self.status_code = status_code
+                self.content = content
+
+        class StubHttpClient(object):
+
+            def get(self, url):
+                self.url = url
+                return StubHttpResponse(200, 'image data')
+
+        from zaloa import HttpTileFetcher
+        from zaloa import Tileset
+        tileset = Tileset.terrarium
+        stub_http_client = StubHttpClient()
+        url_prefix = 'http://foo'
+        http_tile_fetcher = HttpTileFetcher(stub_http_client, url_prefix)
+        from zaloa import Tile
+        fetch_result = http_tile_fetcher(tileset, Tile(3, 2, 1))
+        self.assertEquals('image data', fetch_result.image_bytes)
+        self.assertEquals(
+            'http://foo/terrarium/3/2/1.png', stub_http_client.url)
+
+    def test_missing(self):
+
+        class StubHttpResponse(object):
+
+            def __init__(self, status_code):
+                self.status_code = status_code
+
+        class StubHttpClient(object):
+
+            def get(self, url):
+                return StubHttpResponse(404)
+
+        from zaloa import HttpTileFetcher
+        from zaloa import Tileset
+        tileset = Tileset.terrarium
+        stub_http_client = StubHttpClient()
+        url_prefix = 'http://foo'
+        http_tile_fetcher = HttpTileFetcher(stub_http_client, url_prefix)
+        from zaloa import Tile
+        from zaloa import MissingTileException
+        with self.assertRaises(MissingTileException) as cm:
+            http_tile_fetcher(tileset, Tile(3, 2, 1))
+        self.assertEquals(Tile(3, 2, 1), cm.exception.tile)
+
+    def test_unknown_exception(self):
+
+        class StubHttpException(Exception):
+            pass
+
+        class StubHttpClient(object):
+
+            def get(self, url):
+                raise StubHttpException('unknown exception')
+
+        from zaloa import HttpTileFetcher
+        from zaloa import Tileset
+        tileset = Tileset.terrarium
+        stub_http_client = StubHttpClient()
+        url_prefix = 'http://foo'
+        http_tile_fetcher = HttpTileFetcher(stub_http_client, url_prefix)
+        from zaloa import Tile
+        from zaloa import MissingTileException
+        with self.assertRaises(Exception) as cm:
+            http_tile_fetcher(tileset, Tile(3, 2, 1))
         self.failIf(isinstance(cm.exception, MissingTileException))
         self.assertEquals('unknown exception', cm.exception.message)
 
@@ -419,8 +495,9 @@ class ProcessTileTest(unittest.TestCase):
         from zaloa import process_tile
         from zaloa import generate_coordinates_512
         from zaloa import Tile
+        from zaloa import Tileset
 
-        def stub_fetch(tile):
+        def stub_fetch(tileset, tile):
             from zaloa import FetchResult
             return FetchResult('image data', tile)
 
@@ -441,6 +518,7 @@ class ProcessTileTest(unittest.TestCase):
             generate_coordinates_512,
             stub_fetch,
             stub_reducer,
+            Tileset.terrarium,
             Tile(0, 0, 0),
         )
 
@@ -461,8 +539,9 @@ class ProcessTileTest(unittest.TestCase):
         from zaloa import process_tile
         from zaloa import generate_coordinates_512
         from zaloa import Tile
+        from zaloa import Tileset
 
-        def stub_fetch(tile):
+        def stub_fetch(tileset, tile):
             # return back
             # r g
             # b w
@@ -492,6 +571,7 @@ class ProcessTileTest(unittest.TestCase):
             generate_coordinates_512,
             stub_fetch,
             image_reducer,
+            Tileset.terrarium,
             Tile(2, 1, 1),
         )
 
@@ -520,8 +600,9 @@ class ProcessTileTest(unittest.TestCase):
         from zaloa import process_tile
         from zaloa import generate_coordinates_260
         from zaloa import Tile
+        from zaloa import Tileset
 
-        def stub_fetch(tile):
+        def stub_fetch(tileset, tile):
             # return back
             # r r r
             # g w g
@@ -552,6 +633,7 @@ class ProcessTileTest(unittest.TestCase):
             generate_coordinates_260,
             stub_fetch,
             image_reducer,
+            Tileset.terrarium,
             Tile(2, 1, 1),
         )
 
@@ -589,8 +671,9 @@ class ProcessTileTest(unittest.TestCase):
         from zaloa import process_tile
         from zaloa import generate_coordinates_516
         from zaloa import Tile
+        from zaloa import Tileset
 
-        def stub_fetch(tile):
+        def stub_fetch(tileset, tile):
             from zaloa import FetchResult
 
             # return back
@@ -635,6 +718,7 @@ class ProcessTileTest(unittest.TestCase):
             generate_coordinates_516,
             stub_fetch,
             image_reducer,
+            Tileset.terrarium,
             Tile(2, 1, 1),
         )
 
