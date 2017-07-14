@@ -13,13 +13,7 @@ Zaloa uses two tilesets as its source:
 1. terrarium
 2. normal
 
-### Terrarium
-
 Supports 512, and buffered variants of 256, namely 260 and 516. The variants have a 2 pixel buffer on each edge.
-
-### Normal
-
-Supports 512. Normal tiles do not have buffered variants.
 
 Tile Generation
 ---------------
