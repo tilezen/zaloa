@@ -6,15 +6,10 @@ from enum import Enum
 from PIL import Image
 from time import time
 import base64
-import boto3
 import json
 import math
 import Queue
 import threading
-
-
-# NOTE: global to cut down on setup time for every request
-s3_client = boto3.client('s3')
 
 
 def is_tile_valid(z, x, y):
@@ -54,6 +49,8 @@ class Tile(object):
 
 
 Tileset = Enum('Tileset', 'terrarium normal')
+
+FetchType = Enum('FetchType', 's3 http')
 
 # TODO fetchresult can grow to contain response caching headers
 FetchResult = namedtuple('FetchResult', 'image_bytes tile')
@@ -136,7 +133,7 @@ def parse_apigateway_path(path):
     return parse_result
 
 
-def generate_s3_key(tileset, tile):
+def make_s3_key(tileset, tile):
     assert tileset in (Tileset.terrarium, Tileset.normal)
     s3_key = '%s/%s.png' % (tileset.name, tile)
     return s3_key
@@ -145,13 +142,12 @@ def generate_s3_key(tileset, tile):
 class S3TileFetcher(object):
     """Fetch the source tile data"""
 
-    def __init__(self, s3_client, bucket, tileset):
+    def __init__(self, s3_client, bucket):
         self.s3_client = s3_client
         self.bucket = bucket
-        self.tileset = tileset
 
-    def __call__(self, tile):
-        s3_key = generate_s3_key(self.tileset, tile)
+    def __call__(self, tileset, tile):
+        s3_key = make_s3_key(tileset, tile)
         try:
             resp = self.s3_client.get_object(
                 Bucket=self.bucket,
@@ -176,6 +172,20 @@ class S3TileFetcher(object):
             else:
                 # re-raise the original exception
                 raise e
+
+
+class HttpTileFetcher(object):
+
+    def __init__(self, http_client, url_prefix):
+        self.http_client = http_client
+        self.url_prefix = url_prefix
+
+    def __call__(self, tileset, tile):
+        url = '%s/%s/%s.png' % (self.url_prefix, tileset.name, tile)
+        resp = self.http_client.get(url)
+        if resp.status_code == 404:
+            raise MissingTileException(tile)
+        return FetchResult(resp.content, tile)
 
 
 class ImageReducer(object):
@@ -487,7 +497,26 @@ def lambda_handler(event, context):
         # NOTE: these need to be set as staging variables in the
         # apigateway integration request mapping
         request_state['env'] = event['env']
-        bucket = event['bucket']
+        # can be "s3" or "http"
+        fetch_type = request_state['fetch'] = event['fetch']
+
+        try:
+            fetch_type = FetchType[fetch_type]
+        except KeyError:
+            assert 0, \
+                'Invalid fetch type: %s - must be s3 or http' % fetch_type
+
+        if fetch_type == FetchType.s3:
+            import boto3
+            bucket = event['bucket']
+            s3_client = boto3.client('s3')
+            tile_fetcher = S3TileFetcher(s3_client, bucket)
+        elif fetch_type == FetchType.http:
+            import requests
+            url_prefix = event['url_prefix']
+            tile_fetcher = HttpTileFetcher(requests, url_prefix)
+        else:
+            assert 0, 'Missing fetch type: %s' % fetch_type.name
 
         status = 200
         # these will get set conditionally based on the path
@@ -519,11 +548,6 @@ def lambda_handler(event, context):
             tilesize = parse_result.tilesize
             request_state['request']['tilesize'] = tilesize
 
-            # NOTE: the s3_client is set up globally at module import
-            # time to cut down on the setup time required for each
-            # function invocation
-            global s3_client
-            tile_fetcher = S3TileFetcher(s3_client, bucket, tileset)
             image_reducer = ImageReducer(tilesize)
 
             # both terrarium and normal tiles follow the same
@@ -541,7 +565,8 @@ def lambda_handler(event, context):
 
             try:
                 image_bytes, timing_metadata, tile_coords = process_tile(
-                    coords_generator, tile_fetcher, image_reducer, tile)
+                    coords_generator, tile_fetcher, image_reducer, tileset,
+                    tile)
                 request_state['timing'].update(timing_metadata)
                 request_state['source-tiles'] = [
                     str(x.tile) for x in tile_coords]
@@ -584,14 +609,15 @@ def lambda_handler(event, context):
         raise Exception(err)
 
 
-def fetch_tiles_single_thread(tile_fetcher, all_tile_coords, timing_fetch):
+def fetch_tiles_single_thread(
+        tile_fetcher, tileset, all_tile_coords, timing_fetch):
     image_inputs = []
     # TODO support cache headers for 304 responses?
     with time_block(timing_fetch, 'total'):
         for tile_coords in all_tile_coords:
             tile = tile_coords.tile
             with time_block(timing_fetch, str(tile)):
-                fetch_result = tile_fetcher(tile)
+                fetch_result = tile_fetcher(tileset, tile)
 
             image_input = ImageInput(
                 fetch_result.image_bytes, tile_coords.image_spec, tile)
@@ -599,16 +625,17 @@ def fetch_tiles_single_thread(tile_fetcher, all_tile_coords, timing_fetch):
     return image_inputs
 
 
-def _time_and_fetch(tile_fetcher, tile_coords, timing_fetch, queue):
+def _time_and_fetch(tile_fetcher, tileset, tile_coords, timing_fetch, queue):
     try:
         with time_block(timing_fetch, str(tile_coords.tile)):
-            fetch_result = tile_fetcher(tile_coords.tile)
+            fetch_result = tile_fetcher(tileset, tile_coords.tile)
     except Exception as e:
         fetch_result = e
     queue.put((fetch_result, tile_coords.image_spec))
 
 
-def fetch_tiles_multi_threaded(tile_fetcher, all_tile_coords, timing_fetch):
+def fetch_tiles_multi_threaded(
+        tile_fetcher, tileset, all_tile_coords, timing_fetch):
     image_inputs = []
     threads = []
     fetch_results_queue = Queue.Queue(len(all_tile_coords))
@@ -616,7 +643,8 @@ def fetch_tiles_multi_threaded(tile_fetcher, all_tile_coords, timing_fetch):
     with time_block(timing_fetch, 'total'):
         for tile_coords in all_tile_coords:
             thread_args = (
-                tile_fetcher, tile_coords, timing_fetch, fetch_results_queue)
+                tile_fetcher, tileset, tile_coords, timing_fetch,
+                fetch_results_queue)
             t = threading.Thread(
                 target=_time_and_fetch,
                 args=thread_args)
@@ -640,7 +668,7 @@ def fetch_tiles_multi_threaded(tile_fetcher, all_tile_coords, timing_fetch):
             raise error
 
 
-def process_tile(coords_generator, tile_fetcher, image_reducer, tile):
+def process_tile(coords_generator, tile_fetcher, image_reducer, tileset, tile):
     timing_fetch = {}
     timing_process = {}
     timing_metadata = dict(
@@ -652,9 +680,9 @@ def process_tile(coords_generator, tile_fetcher, image_reducer, tile):
         all_tile_coords = coords_generator(tile)
 
     # image_inputs = fetch_tiles_single_thread(
-    #     tile_fetcher, all_tile_coords, timing_fetch)
+    #     tile_fetcher, tileset, all_tile_coords, timing_fetch)
     image_inputs = fetch_tiles_multi_threaded(
-        tile_fetcher, all_tile_coords, timing_fetch)
+        tile_fetcher, tileset, all_tile_coords, timing_fetch)
 
     with time_block(timing_process, 'total'):
         image_state = image_reducer.create_initial_state()
