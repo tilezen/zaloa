@@ -19,4 +19,4 @@ upload-base-zip: zaloa.zip
 clean:
 	rm -rf zaloa.zip env
 
-.PHONY: zip download-base-zip build-base-zip upload-base-zip
+.PHONY: upload zip download-base-zip build-base-zip upload-base-zip clean
