@@ -161,7 +161,7 @@ class S3TileFetcher(object):
         except Exception as e:
             try:
                 err_code = e.response['Error']['Code']
-            except:
+            except Exception:
                 err_code = ''
 
             if err_code == 'NoSuchKey':
