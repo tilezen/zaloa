@@ -112,7 +112,7 @@ def parse_apigateway_path(path):
     except ValueError:
         return invalid_parse_result('Invalid tilesize')
 
-    if tilesize not in (260, 512, 516):
+    if tilesize not in (260, 512, 516, 1024, 1028):
         return invalid_parse_result('Invalid tilesize')
 
     try:
@@ -250,6 +250,36 @@ def generate_coordinates_512(tile):
         TileCoordinates(Tile(zp1, dbl_x+1, dbl_y), img_pos(256, 0)),
         TileCoordinates(Tile(zp1, dbl_x, dbl_y+1), img_pos(0, 256)),
         TileCoordinates(Tile(zp1, dbl_x+1, dbl_y+1), img_pos(256, 256)),
+    )
+    return tile_coordinates
+
+
+def generate_coordinates_1024(tile):
+    zp2 = tile.z + 2
+    dbl_x = tile.x * 2
+    dbl_y = tile.y * 2
+    # see ImageSpec description above for coordinate meaning
+
+    tile_coordinates = (
+        TileCoordinates(Tile(zp2, dbl_x, dbl_y), img_pos(0, 0)),
+        TileCoordinates(Tile(zp2, dbl_x+1, dbl_y), img_pos(256, 0)),
+        TileCoordinates(Tile(zp2, dbl_x+2, dbl_y), img_pos(512, 0)),
+        TileCoordinates(Tile(zp2, dbl_x+3, dbl_y), img_pos(768, 0)),
+
+        TileCoordinates(Tile(zp2, dbl_x, dbl_y+1), img_pos(0, 256)),
+        TileCoordinates(Tile(zp2, dbl_x+1, dbl_y+1), img_pos(256, 256)),
+        TileCoordinates(Tile(zp2, dbl_x+2, dbl_y+1), img_pos(512, 256)),
+        TileCoordinates(Tile(zp2, dbl_x+3, dbl_y+1), img_pos(768, 256)),
+
+        TileCoordinates(Tile(zp2, dbl_x, dbl_y+2), img_pos(0, 512)),
+        TileCoordinates(Tile(zp2, dbl_x+1, dbl_y+2), img_pos(256, 512)),
+        TileCoordinates(Tile(zp2, dbl_x+2, dbl_y+2), img_pos(512, 512)),
+        TileCoordinates(Tile(zp2, dbl_x+3, dbl_y+2), img_pos(768, 512)),
+
+        TileCoordinates(Tile(zp2, dbl_x, dbl_y+3), img_pos(0, 768)),
+        TileCoordinates(Tile(zp2, dbl_x+1, dbl_y+2), img_pos(256, 768)),
+        TileCoordinates(Tile(zp2, dbl_x+2, dbl_y+2), img_pos(512, 768)),
+        TileCoordinates(Tile(zp2, dbl_x+3, dbl_y+2), img_pos(768, 768)),
     )
     return tile_coordinates
 
@@ -559,6 +589,8 @@ def lambda_handler(event, context):
                 coords_generator = generate_coordinates_260
             elif tilesize == 516:
                 coords_generator = generate_coordinates_516
+            elif tilesize == 1024:
+                coords_generator = generate_coordinates_1024
             else:
                 assert not 'tileset/tilesize combination unimplemented: ' \
                            '%s %s' % (tileset, tilesize)
