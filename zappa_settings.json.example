@@ -1,0 +1,27 @@
+{
+    "dev": {
+        "app_function": "zaloa.app",
+        "aws_region": "us-east-1",
+        "project_name": "zaloa",
+        "runtime": "python3.6",
+        "s3_bucket": "replace-with-your-own-zappa-deploys-bucket",
+        "route53_enabled": false,
+        "memory_size": 128,
+        "project_name": "zaloa",
+        "environment_variables": {
+            "CACHE_MAX_AGE": "3600",
+            "SHARED_CACHE_MAX_AGE": "1800",
+            "S3_BUCKET": "elevation-tiles-prod"
+        }
+    },
+    "prod": {
+        "extends": "dev",
+        "debug": false,
+        "log_level": "WARN",
+        "environment_variables": {
+            "CACHE_MAX_AGE": "259200",
+            "SHARED_CACHE_MAX_AGE": "21600",
+            "S3_BUCKET": "elevation-tiles-prod"
+        }
+    }
+}
