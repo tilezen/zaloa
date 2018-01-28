@@ -141,7 +141,6 @@ class ImageReducer(object):
 
     def __init__(self, tilesize):
         self.tilesize = tilesize
-        assert tilesize in (512, 516, 260)
 
     def create_initial_state(self):
         image_state = Image.new('RGBA', (self.tilesize, self.tilesize))
@@ -185,6 +184,12 @@ def img_pos(x, y):
     pos = x, y
     crop = None
     return ImageSpec(pos, crop)
+
+
+def generate_coordinates_256(tile):
+    return [
+        TileCoordinates(tile, img_pos(0, 0))
+    ]
 
 
 def generate_coordinates_512(tile):
@@ -524,7 +529,7 @@ def process_tile(coords_generator, tile_fetcher, image_reducer, tileset, tile):
 @app.route('/tilezen/terrain/v1/<int:tilesize>/<tileset>/<int:z>/<int:x>/<int:y>.png')
 def handle_tile(tilesize, tileset, z, x, y):
 
-    if tilesize not in (260, 512, 516):
+    if tilesize not in (256, 260, 512, 516):
         return "Unknown tile size", 404
 
     try:
@@ -549,7 +554,11 @@ def handle_tile(tilesize, tileset, z, x, y):
     # both terrarium and normal tiles follow the same
     # coordinate generation strategy. They just point to a
     # different location for the source data
-    if tilesize == 512:
+    if tilesize == 256:
+        # Pass the tile straight through, basically proxying/rewriting the
+        # URL to the terrain tiles bucket because CloudFront can't do it for us.
+        coords_generator = generate_coordinates_256
+    elif tilesize == 512:
         coords_generator = generate_coordinates_512
     elif tilesize == 260:
         coords_generator = generate_coordinates_260
