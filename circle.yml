@@ -1,13 +1,6 @@
 dependencies:
   pre:
-    - pip install -Ur requirements.txt
-    - pip install -U boto3 flake8
+    - pipenv install --dev
 test:
   override:
-    - flake8 zaloa.py test.py
     - python test.py
-deployment:
-  master:
-    branch: master
-    commands:
-      - make download-base-zip upload
