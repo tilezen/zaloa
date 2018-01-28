@@ -12,14 +12,12 @@ import threading
 
 
 from flask import Flask, abort, current_app, make_response, render_template, request, url_for
-from flask_compress import Compress
 from flask_cors import CORS
 
 
 app = Flask(__name__)
 app.config.from_object('config')
 CORS(app)
-Compress(app)
 
 def is_tile_valid(z, x, y):
     if z < 0 or x < 0 or y < 0:
