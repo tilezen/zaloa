@@ -7,12 +7,8 @@ name = "pypi"
 
 [packages]
 
-argparse = "==1.2.1"
-"enum34" = "==1.1.6"
-olefile = "==0.44"
+"enum34" = "*"
 Pillow = "*"
-requests = "==2.18.1"
-wsgiref = "==0.1.2"
 Flask = "*"
 Flask-Cors = "*"
 "boto3" = "*"
