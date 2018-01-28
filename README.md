@@ -113,3 +113,18 @@ This server can run in a normal WSGI environment (on Heroku, with gunicorn, etc.
    ```
 
 1. Once Zappa deploys your code, it will not work until you set the configuration variables mentioned in the Configuration section above. You can set those via [your Zappa configuration file](https://github.com/Miserlou/Zappa#remote-environment-variables) or on the [AWS Lambda console](https://console.aws.amazon.com/lambda/home).
+
+### Improving performance with a CDN
+
+Since the terrain tiles rarely change, a content delivery network (CDN) with edge caching (like [Amazon's CloudFront](https://aws.amazon.com/cloudfront/)) will greatly improve performance. By default, the API Gateway service used by Zappa will use CloudFront, [but in a custom way that doesn't allow caching](https://stackoverflow.com/questions/32825413/how-do-you-add-cloudfront-in-front-of-api-gateway). To work around this, API Gateway supports ["regional" API Gateway](https://forums.aws.amazon.com/thread.jspa?threadID=195290), but Zappa doesn't support the regional endpoint.
+
+To allow standard CloudFront caching, do the following:
+
+1. Run a standard Zappa deploy as described above. This will create an API Gateway in AWS with an Endpoint Type of "Edge Optimized". You can see those in your [AWS API Gateway Console](https://console.aws.amazon.com/apigateway/home?region=us-east-1#/apis).
+1. Click the gear icon in the upper right for the API that you want to put a CloudFront distribution in front of.
+1. Change the "Endpoint Type" dropdown to "Regional" and click "Save" to commit the change.
+1. Click on the API's name to see the Resources list for the API. On the left click "Dashboard" to reveal the Invoke URL at the top. It'll look like `https://xyz.execute-api.us-east-1.amazonaws.com/prod`. Note that URL to use in a later step.
+1. Head to your CloudFront distribution and add an Origin.
+1. In the Origin Domain Name text field, enter the domain name from the Invoke URL. In the example case it is `xyz.execute-api.us-east-1.amazonaws.com`.
+1. In the Origin Path text field, enter the path component from the Invoke URL. In the example case it is `/prod`. The leading slash is important.
+1. Toggle the "HTTPS Only" option and click the blue "Create" button.
