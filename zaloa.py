@@ -55,8 +55,6 @@ class Tile(object):
 
 Tileset = Enum('Tileset', 'terrarium normal')
 
-FetchType = Enum('FetchType', 's3 http')
-
 # TODO fetchresult can grow to contain response caching headers
 FetchResult = namedtuple('FetchResult', 'image_bytes tile')
 
@@ -70,8 +68,6 @@ ImageSpec = namedtuple('ImageSpec', 'location crop_bounds')
 
 TileCoordinates = namedtuple('TileCoordinates', 'tile image_spec')
 ImageInput = namedtuple('ImageInput', 'image_bytes image_spec tile')
-PathParseResult = namedtuple('PathParseResult',
-                             'not_found_reason tileset tilesize tile')
 
 
 class MissingTileException(Exception):
@@ -85,57 +81,6 @@ class MissingTileException(Exception):
     def __init__(self, tile):
         super(MissingTileException, self).__init__('Missing tile: %s' % tile)
         self.tile = tile
-
-
-def invalid_parse_result(reason):
-    return PathParseResult(reason, None, None, None)
-
-
-def parse_apigateway_path(path):
-    path_parts = path.split('/')
-    try:
-        tilesize_str, tileset_name, z_s, x_s, y_fmt = path_parts
-    except ValueError:
-        return invalid_parse_result('Invalid url path')
-
-    y_fmt_parts = y_fmt.split('.')
-    try:
-        y_s, fmt = y_fmt_parts
-    except ValueError:
-        return invalid_parse_result('Invalid format')
-
-    if fmt != 'png':
-        return invalid_parse_result('Invalid format')
-
-    try:
-        tileset = Tileset[tileset_name]
-    except KeyError:
-        return invalid_parse_result('Invalid tileset')
-
-    try:
-        tilesize = int(tilesize_str)
-    except ValueError:
-        return invalid_parse_result('Invalid tilesize')
-
-    if tilesize not in (260, 512, 516):
-        return invalid_parse_result('Invalid tilesize')
-
-    try:
-        z = int(z_s)
-        x = int(x_s)
-        y = int(y_s)
-    except ValueError:
-        return invalid_parse_result('Invalid tile coordinate')
-
-    if not is_tile_valid(z, x, y):
-        return invalid_parse_result('Invalid tile coordinate')
-
-    if tilesize != 260 and z == 15:
-        return invalid_parse_result('Invalid zoom')
-
-    tile = Tile(z, x, y)
-    parse_result = PathParseResult(None, tileset, tilesize, tile)
-    return parse_result
 
 
 def make_s3_key(tileset, tile):
@@ -584,7 +529,9 @@ def handle_tile(tilesize, tileset, z, x, y):
     if tilesize not in (260, 512, 516):
         return "Unknown tile size", 404
 
-    if not is_tile_valid(z, x, y):
+    try:
+        tile = Tile(z, x, y)
+    except AssertionError:
         return "Invalid tile coordinates", 404
 
     if tilesize != 260 and z == 15:
@@ -613,8 +560,6 @@ def handle_tile(tilesize, tileset, z, x, y):
     else:
         return "Unimplemented tileset/tilesize combination unimplemented: %s/%s" \
             % (tileset, tilesize), 404
-
-    tile = Tile(z, x, y)
 
     image_bytes, timing_metadata, tile_coords = process_tile(
         coords_generator, tile_fetcher, image_reducer, tileset, tile)
