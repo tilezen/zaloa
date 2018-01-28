@@ -4,5 +4,4 @@ dependencies:
     - pipenv install --dev
 test:
   override:
-    - flake8 zaloa.py test.py
-    - python test.py
+    - pipenv run python test.py
