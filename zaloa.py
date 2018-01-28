@@ -371,7 +371,7 @@ def generate_coordinates_516(tile):
 
     # set the row tiles to account for edge cases
     tiles = []
-    for y_iter in xrange(y-1, y+3):
+    for y_iter in range(y-1, y+3):
 
         if y_iter < 0:
             y_val = 0
@@ -380,7 +380,7 @@ def generate_coordinates_516(tile):
         else:
             y_val = y_iter
 
-        for x_iter in xrange(x-1, x+3):
+        for x_iter in range(x-1, x+3):
 
             x_val = x_iter
             if x_iter < 0:
