@@ -1,0 +1,7 @@
+dependencies:
+  pre:
+    - pipenv sync
+test:
+  override:
+    - flake8 zaloa.py test.py
+    - python test.py
