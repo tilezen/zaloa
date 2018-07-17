@@ -1,0 +1,18 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+flask = "*"
+pillow = "*"
+flask-caching = "*"
+flask-cors = "*"
+requests = "*"
+"boto3" = "*"
+
+[dev-packages]
+zappa = "*"
+
+[requires]
+python_version = "3.6"
