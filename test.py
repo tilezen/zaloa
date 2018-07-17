@@ -282,13 +282,13 @@ class CoordsGeneratorTest(unittest.TestCase):
         self.assertEqual(coords[14].tile, Tile(3, 1, 7))
         self.assertEqual(coords[15].tile, Tile(3, 2, 7))
         self.assertEqual(coords[12].image_spec.crop_bounds,
-                          (254, 254, 256, 256))
+                         (254, 254, 256, 256))
         self.assertEqual(coords[13].image_spec.crop_bounds,
-                          (0, 254, 256, 256))
+                         (0, 254, 256, 256))
         self.assertEqual(coords[14].image_spec.crop_bounds,
-                          (0, 254, 256, 256))
+                         (0, 254, 256, 256))
         self.assertEqual(coords[15].image_spec.crop_bounds,
-                          (0, 254, 2, 256))
+                         (0, 254, 2, 256))
 
     def test_edge_516_botmid(self):
         from zaloa import Tile
@@ -304,13 +304,13 @@ class CoordsGeneratorTest(unittest.TestCase):
         self.assertEqual(coords[14].tile, Tile(3, 3, 7))
         self.assertEqual(coords[15].tile, Tile(3, 4, 7))
         self.assertEqual(coords[12].image_spec.crop_bounds,
-                          (254, 254, 256, 256))
+                         (254, 254, 256, 256))
         self.assertEqual(coords[13].image_spec.crop_bounds,
-                          (0, 254, 256, 256))
+                         (0, 254, 256, 256))
         self.assertEqual(coords[14].image_spec.crop_bounds,
-                          (0, 254, 256, 256))
+                         (0, 254, 256, 256))
         self.assertEqual(coords[15].image_spec.crop_bounds,
-                          (0, 254, 2, 256))
+                         (0, 254, 2, 256))
 
     def test_edge_516_botright(self):
         from zaloa import Tile
@@ -326,13 +326,13 @@ class CoordsGeneratorTest(unittest.TestCase):
         self.assertEqual(coords[14].tile, Tile(3, 7, 7))
         self.assertEqual(coords[15].tile, Tile(3, 0, 7))
         self.assertEqual(coords[12].image_spec.crop_bounds,
-                          (254, 254, 256, 256))
+                         (254, 254, 256, 256))
         self.assertEqual(coords[13].image_spec.crop_bounds,
-                          (0, 254, 256, 256))
+                         (0, 254, 256, 256))
         self.assertEqual(coords[14].image_spec.crop_bounds,
-                          (0, 254, 256, 256))
+                         (0, 254, 256, 256))
         self.assertEqual(coords[15].image_spec.crop_bounds,
-                          (0, 254, 2, 256))
+                         (0, 254, 2, 256))
 
 
 class S3FetchTest(unittest.TestCase):

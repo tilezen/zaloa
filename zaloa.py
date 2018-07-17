@@ -100,10 +100,7 @@ class S3TileFetcher(object):
             # TODO caching response headers
             return FetchResult(image_bytes, tile)
         except Exception as e:
-            try:
-                err_code = e.response['Error']['Code']
-            except:
-                err_code = ''
+            err_code = e.response.get('Error', {}).get('Code')
 
             if err_code == 'NoSuchKey':
                 # opt to return these more specifically as an exception
