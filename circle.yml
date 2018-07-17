@@ -1,8 +1,8 @@
 dependencies:
   pre:
-    - pip install pipenv
+    - pip install pipenv flake8
     - pipenv sync
 test:
   override:
     - flake8 zaloa.py test.py
-    - python test.py
+    - pipenv run test.py
