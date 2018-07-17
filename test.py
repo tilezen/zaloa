@@ -343,9 +343,9 @@ class S3FetchTest(unittest.TestCase):
 
             def get_object(self, **kwargs):
                 self.kwargs = kwargs
-                from StringIO import StringIO
+                from io import BytesIO
                 return dict(
-                    Body=StringIO('image data'),
+                    Body=BytesIO(b'image data'),
                 )
 
         from zaloa import S3TileFetcher
@@ -355,7 +355,7 @@ class S3FetchTest(unittest.TestCase):
         s3_tile_fetcher = S3TileFetcher(stub_s3_client, bucket)
         from zaloa import Tile
         fetch_result = s3_tile_fetcher(tileset, Tile(3, 2, 1))
-        self.assertEqual('image data', fetch_result.image_bytes)
+        self.assertEqual(b'image data', fetch_result.image_bytes)
         self.assertEqual('fake-bucket', stub_s3_client.kwargs['Bucket'])
         self.assertEqual('terrarium/3/2/1.png', stub_s3_client.kwargs['Key'])
 
@@ -390,7 +390,10 @@ class S3FetchTest(unittest.TestCase):
     def test_unknown_exception(self):
 
         class StubS3Exception(Exception):
-            pass
+
+            def __init__(self, message):
+                super(StubS3Exception, self).__init__()
+                self.message = message
 
         class StubS3Client(object):
 
@@ -406,7 +409,7 @@ class S3FetchTest(unittest.TestCase):
         from zaloa import MissingTileException
         with self.assertRaises(Exception) as cm:
             s3_tile_fetcher(tileset, Tile(3, 2, 1))
-        self.failIf(isinstance(cm.exception, MissingTileException))
+        self.assertFalse(isinstance(cm.exception, MissingTileException))
         self.assertEqual('unknown exception', cm.exception.message)
 
 
@@ -463,7 +466,10 @@ class HttpFetchTest(unittest.TestCase):
     def test_unknown_exception(self):
 
         class StubHttpException(Exception):
-            pass
+
+            def __init__(self, message):
+                super(StubHttpException, self).__init__()
+                self.message = message
 
         class StubHttpClient(object):
 
@@ -479,7 +485,7 @@ class HttpFetchTest(unittest.TestCase):
         from zaloa import MissingTileException
         with self.assertRaises(Exception) as cm:
             http_tile_fetcher(tileset, Tile(3, 2, 1))
-        self.failIf(isinstance(cm.exception, MissingTileException))
+        self.assertFalse(isinstance(cm.exception, MissingTileException))
         self.assertEqual('unknown exception', cm.exception.message)
 
 
@@ -520,11 +526,11 @@ class ProcessTileTest(unittest.TestCase):
     def _gen_stub_image(self, color):
         from PIL import Image
         im = Image.new('RGB', (256, 256))
-        for y in xrange(256):
-            for x in xrange(256):
+        for y in range(256):
+            for x in range(256):
                 im.putpixel((x, y), color)
-        from StringIO import StringIO
-        fp = StringIO()
+        from io import BytesIO
+        fp = BytesIO()
         im.save(fp, format='PNG')
         return fp.getvalue()
 
@@ -567,8 +573,8 @@ class ProcessTileTest(unittest.TestCase):
             Tile(2, 1, 1),
         )
 
-        from StringIO import StringIO
-        fp = StringIO(image_bytes)
+        from io import BytesIO
+        fp = BytesIO(image_bytes)
         from PIL import Image
         im = Image.open(fp)
 
@@ -583,8 +589,8 @@ class ProcessTileTest(unittest.TestCase):
             ((256, 256, 512, 512), (255, 255, 255, 255)),
         )
         for region_bounds, color in expectations:
-            for y in xrange(region_bounds[1], region_bounds[3]):
-                for x in xrange(region_bounds[0], region_bounds[2]):
+            for y in range(region_bounds[1], region_bounds[3]):
+                for x in range(region_bounds[0], region_bounds[2]):
                     pixel = im.getpixel((x, y))
                     self.assertEqual(color, pixel)
 
@@ -628,8 +634,8 @@ class ProcessTileTest(unittest.TestCase):
             Tile(2, 1, 1),
         )
 
-        from StringIO import StringIO
-        fp = StringIO(image_bytes)
+        from io import BytesIO
+        fp = BytesIO(image_bytes)
         from PIL import Image
         im = Image.open(fp)
 
@@ -653,8 +659,8 @@ class ProcessTileTest(unittest.TestCase):
             ((0, 258, 260, 260), (0, 0, 255, 255)),
         )
         for region_bounds, color in expectations:
-            for y in xrange(region_bounds[1], region_bounds[3]):
-                for x in xrange(region_bounds[0], region_bounds[2]):
+            for y in range(region_bounds[1], region_bounds[3]):
+                for x in range(region_bounds[0], region_bounds[2]):
                     pixel = im.getpixel((x, y))
                     self.assertEqual(color, pixel)
 
@@ -712,8 +718,8 @@ class ProcessTileTest(unittest.TestCase):
             Tile(2, 1, 1),
         )
 
-        from StringIO import StringIO
-        fp = StringIO(image_bytes)
+        from io import BytesIO
+        fp = BytesIO(image_bytes)
         from PIL import Image
         im = Image.open(fp)
 
@@ -737,50 +743,10 @@ class ProcessTileTest(unittest.TestCase):
             ((0, 514, 516, 516), (0, 0, 255, 255)),
         )
         for region_bounds, color in expectations:
-            for y in xrange(region_bounds[1], region_bounds[3]):
-                for x in xrange(region_bounds[0], region_bounds[2]):
+            for y in range(region_bounds[1], region_bounds[3]):
+                for x in range(region_bounds[0], region_bounds[2]):
                     pixel = im.getpixel((x, y))
                     self.assertEqual(color, pixel)
-
-
-class ParsePathTest(unittest.TestCase):
-
-    def test_valid_paths(self):
-        from zaloa import parse_apigateway_path
-
-        def assert_valid_path(path):
-            parse_result = parse_apigateway_path(path)
-            self.assertIsNone(parse_result.not_found_reason)
-
-        assert_valid_path('512/terrarium/1/1/1.png')
-        assert_valid_path('260/terrarium/1/1/1.png')
-        assert_valid_path('516/terrarium/1/1/1.png')
-        assert_valid_path('512/normal/1/1/1.png')
-        assert_valid_path('260/normal/1/1/1.png')
-        assert_valid_path('516/normal/1/1/1.png')
-
-    def assert_not_found(self, path, reason):
-        from zaloa import parse_apigateway_path
-        parse_result = parse_apigateway_path(path)
-        self.assertEqual(reason, parse_result.not_found_reason)
-
-    def test_invalid_tile_format(self):
-        self.assert_not_found('512/terrarium/1/1/1.jpg', 'Invalid format')
-
-    def test_invalid_tilesize(self):
-        self.assert_not_found('200/terrarium/1/1/1.png', 'Invalid tilesize')
-        self.assert_not_found('400/normal/1/1/1.png', 'Invalid tilesize')
-
-    def test_invalid_tileset(self):
-        self.assert_not_found('512/foo/1/1/1.png', 'Invalid tileset')
-
-    def test_invalid_tile_coordinates(self):
-        self.assert_not_found('512/terrarium/1/2/2.png',
-                              'Invalid tile coordinate')
-
-    def test_invalid_tile_coordinate_512(self):
-        self.assert_not_found('512/terrarium/15/1/1.png',
-                              'Invalid zoom')
 
 
 if __name__ == '__main__':

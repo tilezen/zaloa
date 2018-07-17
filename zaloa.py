@@ -122,7 +122,7 @@ class HttpTileFetcher(object):
         self.url_prefix = url_prefix
 
     def __call__(self, tileset, tile):
-        url = '%s/%s/%s.png' % (self.url_prefix, tileset.name, tile)
+        url = '%s/%s/%s.png' % (self.url_prefix, tileset, tile)
         resp = self.http_client.get(url)
         if resp.status_code == 404:
             raise MissingTileException(tile)
