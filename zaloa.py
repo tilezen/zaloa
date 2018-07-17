@@ -1,15 +1,21 @@
 from __future__ import print_function
 
 from collections import namedtuple
-from cStringIO import StringIO
+from io import BytesIO
 from enum import Enum
 from PIL import Image
 from time import time
-import base64
-import json
+from queue import Queue
+from flask import Flask, current_app, make_response
+from flask_cors import CORS
+import boto3
 import math
-import Queue
 import threading
+
+
+app = Flask(__name__)
+app.config.from_object('config')
+CORS(app)
 
 
 def is_tile_valid(z, x, y):
@@ -21,10 +27,6 @@ def is_tile_valid(z, x, y):
     if x >= x_y_limit or y >= x_y_limit:
         return False
     return True
-
-
-def log(request_state):
-    print(json.dumps(request_state))
 
 
 class Tile(object):
@@ -50,8 +52,6 @@ class Tile(object):
 
 Tileset = Enum('Tileset', 'terrarium normal')
 
-FetchType = Enum('FetchType', 's3 http')
-
 # TODO fetchresult can grow to contain response caching headers
 FetchResult = namedtuple('FetchResult', 'image_bytes tile')
 
@@ -65,8 +65,6 @@ ImageSpec = namedtuple('ImageSpec', 'location crop_bounds')
 
 TileCoordinates = namedtuple('TileCoordinates', 'tile image_spec')
 ImageInput = namedtuple('ImageInput', 'image_bytes image_spec tile')
-PathParseResult = namedtuple('PathParseResult',
-                             'not_found_reason tileset tilesize tile')
 
 
 class MissingTileException(Exception):
@@ -80,57 +78,6 @@ class MissingTileException(Exception):
     def __init__(self, tile):
         super(MissingTileException, self).__init__('Missing tile: %s' % tile)
         self.tile = tile
-
-
-def invalid_parse_result(reason):
-    return PathParseResult(reason, None, None, None)
-
-
-def parse_apigateway_path(path):
-    path_parts = path.split('/')
-    try:
-        tilesize_str, tileset_name, z_s, x_s, y_fmt = path_parts
-    except ValueError:
-        return invalid_parse_result('Invalid url path')
-
-    y_fmt_parts = y_fmt.split('.')
-    try:
-        y_s, fmt = y_fmt_parts
-    except ValueError:
-        return invalid_parse_result('Invalid format')
-
-    if fmt != 'png':
-        return invalid_parse_result('Invalid format')
-
-    try:
-        tileset = Tileset[tileset_name]
-    except KeyError:
-        return invalid_parse_result('Invalid tileset')
-
-    try:
-        tilesize = int(tilesize_str)
-    except ValueError:
-        return invalid_parse_result('Invalid tilesize')
-
-    if tilesize not in (260, 512, 516):
-        return invalid_parse_result('Invalid tilesize')
-
-    try:
-        z = int(z_s)
-        x = int(x_s)
-        y = int(y_s)
-    except ValueError:
-        return invalid_parse_result('Invalid tile coordinate')
-
-    if not is_tile_valid(z, x, y):
-        return invalid_parse_result('Invalid tile coordinate')
-
-    if tilesize != 260 and z == 15:
-        return invalid_parse_result('Invalid zoom')
-
-    tile = Tile(z, x, y)
-    parse_result = PathParseResult(None, tileset, tilesize, tile)
-    return parse_result
 
 
 def make_s3_key(tileset, tile):
@@ -193,14 +140,13 @@ class ImageReducer(object):
 
     def __init__(self, tilesize):
         self.tilesize = tilesize
-        assert tilesize in (512, 516, 260)
 
     def create_initial_state(self):
         image_state = Image.new('RGBA', (self.tilesize, self.tilesize))
         return image_state
 
     def reduce(self, image_state, image_input):
-        tile_fp = StringIO(image_input.image_bytes)
+        tile_fp = BytesIO(image_input.image_bytes)
         image_spec = image_input.image_spec
         image = Image.open(tile_fp)
         if image_spec.crop_bounds:
@@ -208,7 +154,7 @@ class ImageReducer(object):
         image_state.paste(image, image_spec.location)
 
     def finalize(self, image_state):
-        out_fp = StringIO()
+        out_fp = BytesIO()
         image_state.save(out_fp, format='PNG')
         image_bytes = out_fp.getvalue()
         return image_bytes
@@ -237,6 +183,12 @@ def img_pos(x, y):
     pos = x, y
     crop = None
     return ImageSpec(pos, crop)
+
+
+def generate_coordinates_256(tile):
+    return [
+        TileCoordinates(tile, img_pos(0, 0))
+    ]
 
 
 def generate_coordinates_512(tile):
@@ -418,7 +370,7 @@ def generate_coordinates_516(tile):
 
     # set the row tiles to account for edge cases
     tiles = []
-    for y_iter in xrange(y-1, y+3):
+    for y_iter in range(y-1, y+3):
 
         if y_iter < 0:
             y_val = 0
@@ -427,7 +379,7 @@ def generate_coordinates_516(tile):
         else:
             y_val = y_iter
 
-        for x_iter in xrange(x-1, x+3):
+        for x_iter in range(x-1, x+3):
 
             x_val = x_iter
             if x_iter < 0:
@@ -488,127 +440,6 @@ def generate_coordinates_516(tile):
     return tile_coordinates
 
 
-def lambda_handler(event, context):
-    request_state = {}
-    request_state['timing'] = timing = {}
-
-    with time_block(timing, 'total'):
-
-        # NOTE: these need to be set as staging variables in the
-        # apigateway integration request mapping
-        request_state['env'] = event['env']
-        # can be "s3" or "http"
-        fetch_type = request_state['fetch'] = event['fetch']
-
-        try:
-            fetch_type = FetchType[fetch_type]
-        except KeyError:
-            assert 0, \
-                'Invalid fetch type: %s - must be s3 or http' % fetch_type
-
-        if fetch_type == FetchType.s3:
-            import boto3
-            bucket = event['bucket']
-            s3_client = boto3.client('s3')
-            tile_fetcher = S3TileFetcher(s3_client, bucket)
-        elif fetch_type == FetchType.http:
-            import requests
-            url_prefix = event['url_prefix']
-            tile_fetcher = HttpTileFetcher(requests, url_prefix)
-        else:
-            assert 0, 'Missing fetch type: %s' % fetch_type.name
-
-        status = 200
-        # these will get set conditionally based on the path
-        # and status will be updated appropriately
-        reason_not_found = ''
-        reason_error = ''
-        response = ''
-
-        # captures the state of the requested path, and the more
-        # specific parts as parse continues
-        request_state['request'] = {}
-
-        path = request_state['request']['path'] = event['path']
-
-        with time_block(timing, 'parse'):
-            parse_result = parse_apigateway_path(path)
-        if parse_result.not_found_reason:
-            reason_not_found = parse_result.not_found_reason
-            status = 404
-        else:
-            tile = parse_result.tile
-            request_state['request']['tile'] = dict(
-                z=tile.z,
-                x=tile.x,
-                y=tile.y,
-            )
-            tileset = parse_result.tileset
-            request_state['request']['tileset'] = tileset.name
-            tilesize = parse_result.tilesize
-            request_state['request']['tilesize'] = tilesize
-
-            image_reducer = ImageReducer(tilesize)
-
-            # both terrarium and normal tiles follow the same
-            # coordinate generation strategy. They just point to a
-            # different location for the source data
-            if tilesize == 512:
-                coords_generator = generate_coordinates_512
-            elif tilesize == 260:
-                coords_generator = generate_coordinates_260
-            elif tilesize == 516:
-                coords_generator = generate_coordinates_516
-            else:
-                assert not 'tileset/tilesize combination unimplemented: ' \
-                           '%s %s' % (tileset, tilesize)
-
-            try:
-                image_bytes, timing_metadata, tile_coords = process_tile(
-                    coords_generator, tile_fetcher, image_reducer, tileset,
-                    tile)
-                request_state['timing'].update(timing_metadata)
-                request_state['source-tiles'] = [
-                    str(x.tile) for x in tile_coords]
-
-                # base 64 encode the response
-                with time_block(timing, 'b64'):
-                    response = base64.b64encode(image_bytes)
-
-            except Exception as e:
-                if isinstance(e, MissingTileException):
-                    request_state['missing_tile'] = dict(
-                        z=e.tile.z,
-                        x=e.tile.x,
-                        y=e.tile.y,
-                    )
-                status = 500
-                # this logs any unexpected exceptions to the log, and will
-                # provide a stack trace
-                import traceback
-                traceback.print_exc()
-                reason_error = str(e)
-
-    # finalize request state and log it
-    request_state['status'] = status
-    if status == 404:
-        request_state['error'] = reason_not_found
-    elif status == 500:
-        request_state['error'] = reason_error
-
-    log(request_state)
-
-    # return the appropriate response
-    if status == 200:
-        return response
-    else:
-        if status == 404:
-            err = 'Not Found: %s' % reason_not_found
-        else:
-            err = 'Internal Server Error: %s' % reason_error
-        raise Exception(err)
-
-
 def fetch_tiles_single_thread(
         tile_fetcher, tileset, all_tile_coords, timing_fetch):
     image_inputs = []
@@ -638,7 +469,7 @@ def fetch_tiles_multi_threaded(
         tile_fetcher, tileset, all_tile_coords, timing_fetch):
     image_inputs = []
     threads = []
-    fetch_results_queue = Queue.Queue(len(all_tile_coords))
+    fetch_results_queue = Queue(len(all_tile_coords))
     error = None
     with time_block(timing_fetch, 'total'):
         for tile_coords in all_tile_coords:
@@ -654,7 +485,7 @@ def fetch_tiles_multi_threaded(
         for t in threads:
             t.join()
 
-        for i in xrange(len(threads)):
+        for i in range(len(threads)):
             fetch_result, image_spec = fetch_results_queue.get()
             if isinstance(fetch_result, Exception):
                 error = fetch_result
@@ -679,8 +510,6 @@ def process_tile(coords_generator, tile_fetcher, image_reducer, tileset, tile):
     with time_block(timing_metadata, 'coords-gen'):
         all_tile_coords = coords_generator(tile)
 
-    # image_inputs = fetch_tiles_single_thread(
-    #     tile_fetcher, tileset, all_tile_coords, timing_fetch)
     image_inputs = fetch_tiles_multi_threaded(
         tile_fetcher, tileset, all_tile_coords, timing_fetch)
 
@@ -694,3 +523,57 @@ def process_tile(coords_generator, tile_fetcher, image_reducer, tileset, tile):
         image_bytes = image_reducer.finalize(image_state)
 
     return image_bytes, timing_metadata, all_tile_coords
+
+
+@app.route('/tilezen/terrain/v1/<int:tilesize>/<tileset>/<int:z>/<int:x>/<int:y>.png')
+def handle_tile(tilesize, tileset, z, x, y):
+
+    if tilesize not in (256, 260, 512, 516):
+        return "Unknown tile size", 404
+
+    try:
+        tile = Tile(z, x, y)
+    except AssertionError:
+        return "Invalid tile coordinates", 404
+
+    if tilesize != 260 and z == 15:
+        return "Invalid zoom for pixel size", 404
+
+    try:
+        tileset = Tileset[tileset]
+    except KeyError:
+        return "Invalid tileset '%s'" % tileset, 404
+
+    s3_client = boto3.client('s3')
+    bucket = current_app.config.get("S3_BUCKET")
+    tile_fetcher = S3TileFetcher(s3_client, bucket)
+
+    image_reducer = ImageReducer(tilesize)
+
+    # both terrarium and normal tiles follow the same
+    # coordinate generation strategy. They just point to a
+    # different location for the source data
+    if tilesize == 256:
+        # Pass the tile straight through, basically proxying/rewriting the
+        # URL to the terrain tiles bucket because CloudFront can't do it for us.
+        coords_generator = generate_coordinates_256
+    elif tilesize == 512:
+        coords_generator = generate_coordinates_512
+    elif tilesize == 260:
+        coords_generator = generate_coordinates_260
+    elif tilesize == 516:
+        coords_generator = generate_coordinates_516
+    else:
+        return "Unimplemented tileset/tilesize combination unimplemented: %s/%s" \
+            % (tileset, tilesize), 404
+
+    image_bytes, timing_metadata, tile_coords = process_tile(
+        coords_generator, tile_fetcher, image_reducer, tileset, tile)
+
+    response = make_response(image_bytes)
+    response.content_type = 'image/png'
+    response.cache_control.public = True
+    response.cache_control.max_age = current_app.config.get("CACHE_MAX_AGE")
+    if current_app.config.get("SHARED_CACHE_MAX_AGE"):
+        response.cache_control.s_maxage = current_app.config.get("SHARED_CACHE_MAX_AGE")
+    return response

@@ -1,1 +1,4 @@
-zaloa.zip
+__pycache__/
+*.pyc
+zappa_settings.json
+
