@@ -2,11 +2,8 @@ from __future__ import print_function
 
 from collections import namedtuple
 from io import BytesIO
-from enum import Enum
 from PIL import Image
 from time import time
-import base64
-import json
 import math
 import queue
 import threading
@@ -21,10 +18,6 @@ def is_tile_valid(z, x, y):
     if x >= x_y_limit or y >= x_y_limit:
         return False
     return True
-
-
-def log(request_state):
-    print(json.dumps(request_state))
 
 
 class Tile(object):
