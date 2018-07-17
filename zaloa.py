@@ -75,53 +75,6 @@ def invalid_parse_result(reason):
     return PathParseResult(reason, None, None, None)
 
 
-def parse_apigateway_path(path):
-    path_parts = path.split('/')
-    try:
-        tilesize_str, tileset_name, z_s, x_s, y_fmt = path_parts
-    except ValueError:
-        return invalid_parse_result('Invalid url path')
-
-    y_fmt_parts = y_fmt.split('.')
-    try:
-        y_s, fmt = y_fmt_parts
-    except ValueError:
-        return invalid_parse_result('Invalid format')
-
-    if fmt != 'png':
-        return invalid_parse_result('Invalid format')
-
-    try:
-        tileset = Tileset[tileset_name]
-    except KeyError:
-        return invalid_parse_result('Invalid tileset')
-
-    try:
-        tilesize = int(tilesize_str)
-    except ValueError:
-        return invalid_parse_result('Invalid tilesize')
-
-    if tilesize not in (260, 512, 516):
-        return invalid_parse_result('Invalid tilesize')
-
-    try:
-        z = int(z_s)
-        x = int(x_s)
-        y = int(y_s)
-    except ValueError:
-        return invalid_parse_result('Invalid tile coordinate')
-
-    if not is_tile_valid(z, x, y):
-        return invalid_parse_result('Invalid tile coordinate')
-
-    if tilesize != 260 and z == 15:
-        return invalid_parse_result('Invalid zoom')
-
-    tile = Tile(z, x, y)
-    parse_result = PathParseResult(None, tileset, tilesize, tile)
-    return parse_result
-
-
 def make_s3_key(tileset, tile):
     s3_key = '%s/%s.png' % (tileset, tile)
     return s3_key

@@ -5,4 +5,4 @@ dependencies:
 test:
   override:
     - flake8 zaloa.py test.py
-    - pipenv run test.py
+    - pipenv run python test.py
