@@ -15,7 +15,7 @@ class CoordsGeneratorTest(unittest.TestCase):
             Tile(1, 0, 1),
             Tile(1, 1, 1),
         ]
-        self.assertEquals(exp_coords, just_tile_coords)
+        self.assertEqual(exp_coords, just_tile_coords)
 
     def test_260(self):
         from zaloa import Tile
@@ -28,7 +28,7 @@ class CoordsGeneratorTest(unittest.TestCase):
             Tile(2, 0, 1), Tile(2, 1, 1), Tile(2, 2, 1),
             Tile(2, 0, 2), Tile(2, 1, 2), Tile(2, 2, 2),
         ]
-        self.assertEquals(exp_coords, just_tile_coords)
+        self.assertEqual(exp_coords, just_tile_coords)
 
     def test_516(self):
         from zaloa import Tile
@@ -42,7 +42,7 @@ class CoordsGeneratorTest(unittest.TestCase):
             Tile(3, 1, 3), Tile(3, 2, 3), Tile(3, 3, 3), Tile(3, 4, 3),
             Tile(3, 1, 4), Tile(3, 2, 4), Tile(3, 3, 4), Tile(3, 4, 4),
         ]
-        self.assertEquals(exp_coords, just_tile_coords)
+        self.assertEqual(exp_coords, just_tile_coords)
 
     def test_edge_260_topleft(self):
         from zaloa import Tile
@@ -50,15 +50,15 @@ class CoordsGeneratorTest(unittest.TestCase):
         tile = Tile(2, 0, 0)
         all_coords = generate_coordinates_260(tile)
         nw, n, ne, w, c, e, sw, s, se = all_coords
-        self.assertEquals(nw.tile, Tile(2, 3, 0))
-        self.assertEquals(n.tile, Tile(2, 0, 0))
-        self.assertEquals(ne.tile, Tile(2, 1, 0))
-        self.assertEquals(w.tile, Tile(2, 3, 0))
-        self.assertEquals(c.tile, Tile(2, 0, 0))
-        self.assertEquals(e.tile, Tile(2, 1, 0))
-        self.assertEquals(nw.image_spec.crop_bounds, (254, 0, 256, 2))
-        self.assertEquals(n.image_spec.crop_bounds, (0, 0, 256, 2))
-        self.assertEquals(ne.image_spec.crop_bounds, (0, 0, 2, 2))
+        self.assertEqual(nw.tile, Tile(2, 3, 0))
+        self.assertEqual(n.tile, Tile(2, 0, 0))
+        self.assertEqual(ne.tile, Tile(2, 1, 0))
+        self.assertEqual(w.tile, Tile(2, 3, 0))
+        self.assertEqual(c.tile, Tile(2, 0, 0))
+        self.assertEqual(e.tile, Tile(2, 1, 0))
+        self.assertEqual(nw.image_spec.crop_bounds, (254, 0, 256, 2))
+        self.assertEqual(n.image_spec.crop_bounds, (0, 0, 256, 2))
+        self.assertEqual(ne.image_spec.crop_bounds, (0, 0, 2, 2))
 
     def test_edge_260_topmid(self):
         from zaloa import Tile
@@ -66,15 +66,15 @@ class CoordsGeneratorTest(unittest.TestCase):
         tile = Tile(2, 1, 0)
         all_coords = generate_coordinates_260(tile)
         nw, n, ne, w, c, e, sw, s, se = all_coords
-        self.assertEquals(nw.tile, Tile(2, 0, 0))
-        self.assertEquals(n.tile, Tile(2, 1, 0))
-        self.assertEquals(ne.tile, Tile(2, 2, 0))
-        self.assertEquals(w.tile, Tile(2, 0, 0))
-        self.assertEquals(c.tile, Tile(2, 1, 0))
-        self.assertEquals(e.tile, Tile(2, 2, 0))
-        self.assertEquals(nw.image_spec.crop_bounds, (254, 0, 256, 2))
-        self.assertEquals(n.image_spec.crop_bounds, (0, 0, 256, 2))
-        self.assertEquals(ne.image_spec.crop_bounds, (0, 0, 2, 2))
+        self.assertEqual(nw.tile, Tile(2, 0, 0))
+        self.assertEqual(n.tile, Tile(2, 1, 0))
+        self.assertEqual(ne.tile, Tile(2, 2, 0))
+        self.assertEqual(w.tile, Tile(2, 0, 0))
+        self.assertEqual(c.tile, Tile(2, 1, 0))
+        self.assertEqual(e.tile, Tile(2, 2, 0))
+        self.assertEqual(nw.image_spec.crop_bounds, (254, 0, 256, 2))
+        self.assertEqual(n.image_spec.crop_bounds, (0, 0, 256, 2))
+        self.assertEqual(ne.image_spec.crop_bounds, (0, 0, 2, 2))
 
     def test_edge_260_topright(self):
         from zaloa import Tile
@@ -82,15 +82,15 @@ class CoordsGeneratorTest(unittest.TestCase):
         tile = Tile(2, 3, 0)
         all_coords = generate_coordinates_260(tile)
         nw, n, ne, w, c, e, sw, s, se = all_coords
-        self.assertEquals(nw.tile, Tile(2, 2, 0))
-        self.assertEquals(n.tile, Tile(2, 3, 0))
-        self.assertEquals(ne.tile, Tile(2, 0, 0))
-        self.assertEquals(w.tile, Tile(2, 2, 0))
-        self.assertEquals(c.tile, Tile(2, 3, 0))
-        self.assertEquals(e.tile, Tile(2, 0, 0))
-        self.assertEquals(nw.image_spec.crop_bounds, (254, 0, 256, 2))
-        self.assertEquals(n.image_spec.crop_bounds, (0, 0, 256, 2))
-        self.assertEquals(ne.image_spec.crop_bounds, (0, 0, 2, 2))
+        self.assertEqual(nw.tile, Tile(2, 2, 0))
+        self.assertEqual(n.tile, Tile(2, 3, 0))
+        self.assertEqual(ne.tile, Tile(2, 0, 0))
+        self.assertEqual(w.tile, Tile(2, 2, 0))
+        self.assertEqual(c.tile, Tile(2, 3, 0))
+        self.assertEqual(e.tile, Tile(2, 0, 0))
+        self.assertEqual(nw.image_spec.crop_bounds, (254, 0, 256, 2))
+        self.assertEqual(n.image_spec.crop_bounds, (0, 0, 256, 2))
+        self.assertEqual(ne.image_spec.crop_bounds, (0, 0, 2, 2))
 
     def test_edge_260_botleft(self):
         from zaloa import Tile
@@ -98,15 +98,15 @@ class CoordsGeneratorTest(unittest.TestCase):
         tile = Tile(2, 0, 3)
         all_coords = generate_coordinates_260(tile)
         nw, n, ne, w, c, e, sw, s, se = all_coords
-        self.assertEquals(sw.tile, Tile(2, 3, 3))
-        self.assertEquals(s.tile, Tile(2, 0, 3))
-        self.assertEquals(se.tile, Tile(2, 1, 3))
-        self.assertEquals(w.tile, Tile(2, 3, 3))
-        self.assertEquals(c.tile, Tile(2, 0, 3))
-        self.assertEquals(e.tile, Tile(2, 1, 3))
-        self.assertEquals(sw.image_spec.crop_bounds, (254, 254, 256, 256))
-        self.assertEquals(s.image_spec.crop_bounds, (0, 254, 256, 256))
-        self.assertEquals(se.image_spec.crop_bounds, (0, 254, 2, 256))
+        self.assertEqual(sw.tile, Tile(2, 3, 3))
+        self.assertEqual(s.tile, Tile(2, 0, 3))
+        self.assertEqual(se.tile, Tile(2, 1, 3))
+        self.assertEqual(w.tile, Tile(2, 3, 3))
+        self.assertEqual(c.tile, Tile(2, 0, 3))
+        self.assertEqual(e.tile, Tile(2, 1, 3))
+        self.assertEqual(sw.image_spec.crop_bounds, (254, 254, 256, 256))
+        self.assertEqual(s.image_spec.crop_bounds, (0, 254, 256, 256))
+        self.assertEqual(se.image_spec.crop_bounds, (0, 254, 2, 256))
 
     def test_edge_260_botmid(self):
         from zaloa import Tile
@@ -114,15 +114,15 @@ class CoordsGeneratorTest(unittest.TestCase):
         tile = Tile(2, 2, 3)
         all_coords = generate_coordinates_260(tile)
         nw, n, ne, w, c, e, sw, s, se = all_coords
-        self.assertEquals(sw.tile, Tile(2, 1, 3))
-        self.assertEquals(s.tile, Tile(2, 2, 3))
-        self.assertEquals(se.tile, Tile(2, 3, 3))
-        self.assertEquals(w.tile, Tile(2, 1, 3))
-        self.assertEquals(c.tile, Tile(2, 2, 3))
-        self.assertEquals(e.tile, Tile(2, 3, 3))
-        self.assertEquals(sw.image_spec.crop_bounds, (254, 254, 256, 256))
-        self.assertEquals(s.image_spec.crop_bounds, (0, 254, 256, 256))
-        self.assertEquals(se.image_spec.crop_bounds, (0, 254, 2, 256))
+        self.assertEqual(sw.tile, Tile(2, 1, 3))
+        self.assertEqual(s.tile, Tile(2, 2, 3))
+        self.assertEqual(se.tile, Tile(2, 3, 3))
+        self.assertEqual(w.tile, Tile(2, 1, 3))
+        self.assertEqual(c.tile, Tile(2, 2, 3))
+        self.assertEqual(e.tile, Tile(2, 3, 3))
+        self.assertEqual(sw.image_spec.crop_bounds, (254, 254, 256, 256))
+        self.assertEqual(s.image_spec.crop_bounds, (0, 254, 256, 256))
+        self.assertEqual(se.image_spec.crop_bounds, (0, 254, 2, 256))
 
     def test_edge_260_botright(self):
         from zaloa import Tile
@@ -130,15 +130,15 @@ class CoordsGeneratorTest(unittest.TestCase):
         tile = Tile(2, 3, 3)
         all_coords = generate_coordinates_260(tile)
         nw, n, ne, w, c, e, sw, s, se = all_coords
-        self.assertEquals(sw.tile, Tile(2, 2, 3))
-        self.assertEquals(s.tile, Tile(2, 3, 3))
-        self.assertEquals(se.tile, Tile(2, 0, 3))
-        self.assertEquals(w.tile, Tile(2, 2, 3))
-        self.assertEquals(c.tile, Tile(2, 3, 3))
-        self.assertEquals(e.tile, Tile(2, 0, 3))
-        self.assertEquals(sw.image_spec.crop_bounds, (254, 254, 256, 256))
-        self.assertEquals(s.image_spec.crop_bounds, (0, 254, 256, 256))
-        self.assertEquals(se.image_spec.crop_bounds, (0, 254, 2, 256))
+        self.assertEqual(sw.tile, Tile(2, 2, 3))
+        self.assertEqual(s.tile, Tile(2, 3, 3))
+        self.assertEqual(se.tile, Tile(2, 0, 3))
+        self.assertEqual(w.tile, Tile(2, 2, 3))
+        self.assertEqual(c.tile, Tile(2, 3, 3))
+        self.assertEqual(e.tile, Tile(2, 0, 3))
+        self.assertEqual(sw.image_spec.crop_bounds, (254, 254, 256, 256))
+        self.assertEqual(s.image_spec.crop_bounds, (0, 254, 256, 256))
+        self.assertEqual(se.image_spec.crop_bounds, (0, 254, 2, 256))
 
     def test_edge_260_midleft(self):
         from zaloa import Tile
@@ -146,12 +146,12 @@ class CoordsGeneratorTest(unittest.TestCase):
         tile = Tile(2, 0, 2)
         all_coords = generate_coordinates_260(tile)
         nw, n, ne, w, c, e, sw, s, se = all_coords
-        self.assertEquals(w.tile, Tile(2, 3, 2))
-        self.assertEquals(c.tile, Tile(2, 0, 2))
-        self.assertEquals(e.tile, Tile(2, 1, 2))
-        self.assertEquals(w.image_spec.crop_bounds, (254, 0, 256, 256))
+        self.assertEqual(w.tile, Tile(2, 3, 2))
+        self.assertEqual(c.tile, Tile(2, 0, 2))
+        self.assertEqual(e.tile, Tile(2, 1, 2))
+        self.assertEqual(w.image_spec.crop_bounds, (254, 0, 256, 256))
         self.assertIsNone(c.image_spec.crop_bounds)
-        self.assertEquals(e.image_spec.crop_bounds, (0, 0, 2, 256))
+        self.assertEqual(e.image_spec.crop_bounds, (0, 0, 2, 256))
 
     def test_edge_260_midright(self):
         from zaloa import Tile
@@ -159,135 +159,135 @@ class CoordsGeneratorTest(unittest.TestCase):
         tile = Tile(2, 3, 1)
         all_coords = generate_coordinates_260(tile)
         nw, n, ne, w, c, e, sw, s, se = all_coords
-        self.assertEquals(w.tile, Tile(2, 2, 1))
-        self.assertEquals(c.tile, Tile(2, 3, 1))
-        self.assertEquals(e.tile, Tile(2, 0, 1))
-        self.assertEquals(w.image_spec.crop_bounds, (254, 0, 256, 256))
+        self.assertEqual(w.tile, Tile(2, 2, 1))
+        self.assertEqual(c.tile, Tile(2, 3, 1))
+        self.assertEqual(e.tile, Tile(2, 0, 1))
+        self.assertEqual(w.image_spec.crop_bounds, (254, 0, 256, 256))
         self.assertIsNone(c.image_spec.crop_bounds)
-        self.assertEquals(e.image_spec.crop_bounds, (0, 0, 2, 256))
+        self.assertEqual(e.image_spec.crop_bounds, (0, 0, 2, 256))
 
     def test_edge_516_topleft(self):
         from zaloa import Tile
         from zaloa import generate_coordinates_516
         tile = Tile(2, 0, 0)
         coords = generate_coordinates_516(tile)
-        self.assertEquals(coords[0].tile, Tile(3, 7, 0))
-        self.assertEquals(coords[1].tile, Tile(3, 0, 0))
-        self.assertEquals(coords[2].tile, Tile(3, 1, 0))
-        self.assertEquals(coords[3].tile, Tile(3, 2, 0))
-        self.assertEquals(coords[4].tile, Tile(3, 7, 0))
-        self.assertEquals(coords[5].tile, Tile(3, 0, 0))
-        self.assertEquals(coords[6].tile, Tile(3, 1, 0))
-        self.assertEquals(coords[7].tile, Tile(3, 2, 0))
-        self.assertEquals(coords[0].image_spec.crop_bounds, (254, 0, 256, 2))
-        self.assertEquals(coords[1].image_spec.crop_bounds, (0, 0, 256, 2))
-        self.assertEquals(coords[2].image_spec.crop_bounds, (0, 0, 256, 2))
-        self.assertEquals(coords[3].image_spec.crop_bounds, (0, 0, 2, 2))
+        self.assertEqual(coords[0].tile, Tile(3, 7, 0))
+        self.assertEqual(coords[1].tile, Tile(3, 0, 0))
+        self.assertEqual(coords[2].tile, Tile(3, 1, 0))
+        self.assertEqual(coords[3].tile, Tile(3, 2, 0))
+        self.assertEqual(coords[4].tile, Tile(3, 7, 0))
+        self.assertEqual(coords[5].tile, Tile(3, 0, 0))
+        self.assertEqual(coords[6].tile, Tile(3, 1, 0))
+        self.assertEqual(coords[7].tile, Tile(3, 2, 0))
+        self.assertEqual(coords[0].image_spec.crop_bounds, (254, 0, 256, 2))
+        self.assertEqual(coords[1].image_spec.crop_bounds, (0, 0, 256, 2))
+        self.assertEqual(coords[2].image_spec.crop_bounds, (0, 0, 256, 2))
+        self.assertEqual(coords[3].image_spec.crop_bounds, (0, 0, 2, 2))
 
     def test_edge_516_topmid(self):
         from zaloa import Tile
         from zaloa import generate_coordinates_516
         tile = Tile(2, 2, 0)
         coords = generate_coordinates_516(tile)
-        self.assertEquals(coords[0].tile, Tile(3, 3, 0))
-        self.assertEquals(coords[1].tile, Tile(3, 4, 0))
-        self.assertEquals(coords[2].tile, Tile(3, 5, 0))
-        self.assertEquals(coords[3].tile, Tile(3, 6, 0))
-        self.assertEquals(coords[4].tile, Tile(3, 3, 0))
-        self.assertEquals(coords[5].tile, Tile(3, 4, 0))
-        self.assertEquals(coords[6].tile, Tile(3, 5, 0))
-        self.assertEquals(coords[7].tile, Tile(3, 6, 0))
-        self.assertEquals(coords[0].image_spec.crop_bounds, (254, 0, 256, 2))
-        self.assertEquals(coords[1].image_spec.crop_bounds, (0, 0, 256, 2))
-        self.assertEquals(coords[2].image_spec.crop_bounds, (0, 0, 256, 2))
-        self.assertEquals(coords[3].image_spec.crop_bounds, (0, 0, 2, 2))
+        self.assertEqual(coords[0].tile, Tile(3, 3, 0))
+        self.assertEqual(coords[1].tile, Tile(3, 4, 0))
+        self.assertEqual(coords[2].tile, Tile(3, 5, 0))
+        self.assertEqual(coords[3].tile, Tile(3, 6, 0))
+        self.assertEqual(coords[4].tile, Tile(3, 3, 0))
+        self.assertEqual(coords[5].tile, Tile(3, 4, 0))
+        self.assertEqual(coords[6].tile, Tile(3, 5, 0))
+        self.assertEqual(coords[7].tile, Tile(3, 6, 0))
+        self.assertEqual(coords[0].image_spec.crop_bounds, (254, 0, 256, 2))
+        self.assertEqual(coords[1].image_spec.crop_bounds, (0, 0, 256, 2))
+        self.assertEqual(coords[2].image_spec.crop_bounds, (0, 0, 256, 2))
+        self.assertEqual(coords[3].image_spec.crop_bounds, (0, 0, 2, 2))
 
     def test_edge_516_topright(self):
         from zaloa import Tile
         from zaloa import generate_coordinates_516
         tile = Tile(2, 3, 0)
         coords = generate_coordinates_516(tile)
-        self.assertEquals(coords[0].tile, Tile(3, 5, 0))
-        self.assertEquals(coords[1].tile, Tile(3, 6, 0))
-        self.assertEquals(coords[2].tile, Tile(3, 7, 0))
-        self.assertEquals(coords[3].tile, Tile(3, 0, 0))
-        self.assertEquals(coords[4].tile, Tile(3, 5, 0))
-        self.assertEquals(coords[5].tile, Tile(3, 6, 0))
-        self.assertEquals(coords[6].tile, Tile(3, 7, 0))
-        self.assertEquals(coords[7].tile, Tile(3, 0, 0))
-        self.assertEquals(coords[0].tile, Tile(3, 5, 0))
-        self.assertEquals(coords[1].tile, Tile(3, 6, 0))
-        self.assertEquals(coords[2].tile, Tile(3, 7, 0))
-        self.assertEquals(coords[3].tile, Tile(3, 0, 0))
-        self.assertEquals(coords[0].image_spec.crop_bounds, (254, 0, 256, 2))
-        self.assertEquals(coords[1].image_spec.crop_bounds, (0, 0, 256, 2))
-        self.assertEquals(coords[2].image_spec.crop_bounds, (0, 0, 256, 2))
-        self.assertEquals(coords[3].image_spec.crop_bounds, (0, 0, 2, 2))
+        self.assertEqual(coords[0].tile, Tile(3, 5, 0))
+        self.assertEqual(coords[1].tile, Tile(3, 6, 0))
+        self.assertEqual(coords[2].tile, Tile(3, 7, 0))
+        self.assertEqual(coords[3].tile, Tile(3, 0, 0))
+        self.assertEqual(coords[4].tile, Tile(3, 5, 0))
+        self.assertEqual(coords[5].tile, Tile(3, 6, 0))
+        self.assertEqual(coords[6].tile, Tile(3, 7, 0))
+        self.assertEqual(coords[7].tile, Tile(3, 0, 0))
+        self.assertEqual(coords[0].tile, Tile(3, 5, 0))
+        self.assertEqual(coords[1].tile, Tile(3, 6, 0))
+        self.assertEqual(coords[2].tile, Tile(3, 7, 0))
+        self.assertEqual(coords[3].tile, Tile(3, 0, 0))
+        self.assertEqual(coords[0].image_spec.crop_bounds, (254, 0, 256, 2))
+        self.assertEqual(coords[1].image_spec.crop_bounds, (0, 0, 256, 2))
+        self.assertEqual(coords[2].image_spec.crop_bounds, (0, 0, 256, 2))
+        self.assertEqual(coords[3].image_spec.crop_bounds, (0, 0, 2, 2))
 
     def test_edge_516_midleft(self):
         from zaloa import Tile
         from zaloa import generate_coordinates_516
         tile = Tile(2, 0, 3)
         coords = generate_coordinates_516(tile)
-        self.assertEquals(coords[4].tile, Tile(3, 7, 6))
-        self.assertEquals(coords[5].tile, Tile(3, 0, 6))
-        self.assertEquals(coords[6].tile, Tile(3, 1, 6))
-        self.assertEquals(coords[7].tile, Tile(3, 2, 6))
-        self.assertEquals(coords[8].tile, Tile(3, 7, 7))
-        self.assertEquals(coords[9].tile, Tile(3, 0, 7))
-        self.assertEquals(coords[10].tile, Tile(3, 1, 7))
-        self.assertEquals(coords[11].tile, Tile(3, 2, 7))
-        self.assertEquals(coords[4].image_spec.crop_bounds, (254, 0, 256, 256))
-        self.assertEquals(coords[5].image_spec.crop_bounds, None)
-        self.assertEquals(coords[6].image_spec.crop_bounds, None)
-        self.assertEquals(coords[7].image_spec.crop_bounds, (0, 0, 2, 256))
-        self.assertEquals(coords[8].image_spec.crop_bounds, (254, 0, 256, 256))
-        self.assertEquals(coords[9].image_spec.crop_bounds, None)
-        self.assertEquals(coords[10].image_spec.crop_bounds, None)
-        self.assertEquals(coords[11].image_spec.crop_bounds, (0, 0, 2, 256))
+        self.assertEqual(coords[4].tile, Tile(3, 7, 6))
+        self.assertEqual(coords[5].tile, Tile(3, 0, 6))
+        self.assertEqual(coords[6].tile, Tile(3, 1, 6))
+        self.assertEqual(coords[7].tile, Tile(3, 2, 6))
+        self.assertEqual(coords[8].tile, Tile(3, 7, 7))
+        self.assertEqual(coords[9].tile, Tile(3, 0, 7))
+        self.assertEqual(coords[10].tile, Tile(3, 1, 7))
+        self.assertEqual(coords[11].tile, Tile(3, 2, 7))
+        self.assertEqual(coords[4].image_spec.crop_bounds, (254, 0, 256, 256))
+        self.assertEqual(coords[5].image_spec.crop_bounds, None)
+        self.assertEqual(coords[6].image_spec.crop_bounds, None)
+        self.assertEqual(coords[7].image_spec.crop_bounds, (0, 0, 2, 256))
+        self.assertEqual(coords[8].image_spec.crop_bounds, (254, 0, 256, 256))
+        self.assertEqual(coords[9].image_spec.crop_bounds, None)
+        self.assertEqual(coords[10].image_spec.crop_bounds, None)
+        self.assertEqual(coords[11].image_spec.crop_bounds, (0, 0, 2, 256))
 
     def test_edge_516_midright(self):
         from zaloa import Tile
         from zaloa import generate_coordinates_516
         tile = Tile(2, 3, 2)
         coords = generate_coordinates_516(tile)
-        self.assertEquals(coords[4].tile, Tile(3, 5, 4))
-        self.assertEquals(coords[5].tile, Tile(3, 6, 4))
-        self.assertEquals(coords[6].tile, Tile(3, 7, 4))
-        self.assertEquals(coords[7].tile, Tile(3, 0, 4))
-        self.assertEquals(coords[8].tile, Tile(3, 5, 5))
-        self.assertEquals(coords[9].tile, Tile(3, 6, 5))
-        self.assertEquals(coords[10].tile, Tile(3, 7, 5))
-        self.assertEquals(coords[11].tile, Tile(3, 0, 5))
-        self.assertEquals(coords[4].image_spec.crop_bounds, (254, 0, 256, 256))
-        self.assertEquals(coords[5].image_spec.crop_bounds, None)
-        self.assertEquals(coords[6].image_spec.crop_bounds, None)
-        self.assertEquals(coords[7].image_spec.crop_bounds, (0, 0, 2, 256))
-        self.assertEquals(coords[8].image_spec.crop_bounds, (254, 0, 256, 256))
-        self.assertEquals(coords[9].image_spec.crop_bounds, None)
-        self.assertEquals(coords[10].image_spec.crop_bounds, None)
-        self.assertEquals(coords[11].image_spec.crop_bounds, (0, 0, 2, 256))
+        self.assertEqual(coords[4].tile, Tile(3, 5, 4))
+        self.assertEqual(coords[5].tile, Tile(3, 6, 4))
+        self.assertEqual(coords[6].tile, Tile(3, 7, 4))
+        self.assertEqual(coords[7].tile, Tile(3, 0, 4))
+        self.assertEqual(coords[8].tile, Tile(3, 5, 5))
+        self.assertEqual(coords[9].tile, Tile(3, 6, 5))
+        self.assertEqual(coords[10].tile, Tile(3, 7, 5))
+        self.assertEqual(coords[11].tile, Tile(3, 0, 5))
+        self.assertEqual(coords[4].image_spec.crop_bounds, (254, 0, 256, 256))
+        self.assertEqual(coords[5].image_spec.crop_bounds, None)
+        self.assertEqual(coords[6].image_spec.crop_bounds, None)
+        self.assertEqual(coords[7].image_spec.crop_bounds, (0, 0, 2, 256))
+        self.assertEqual(coords[8].image_spec.crop_bounds, (254, 0, 256, 256))
+        self.assertEqual(coords[9].image_spec.crop_bounds, None)
+        self.assertEqual(coords[10].image_spec.crop_bounds, None)
+        self.assertEqual(coords[11].image_spec.crop_bounds, (0, 0, 2, 256))
 
     def test_edge_516_botleft(self):
         from zaloa import Tile
         from zaloa import generate_coordinates_516
         tile = Tile(2, 0, 3)
         coords = generate_coordinates_516(tile)
-        self.assertEquals(coords[8].tile, Tile(3, 7, 7))
-        self.assertEquals(coords[9].tile, Tile(3, 0, 7))
-        self.assertEquals(coords[10].tile, Tile(3, 1, 7))
-        self.assertEquals(coords[11].tile, Tile(3, 2, 7))
-        self.assertEquals(coords[12].tile, Tile(3, 7, 7))
-        self.assertEquals(coords[13].tile, Tile(3, 0, 7))
-        self.assertEquals(coords[14].tile, Tile(3, 1, 7))
-        self.assertEquals(coords[15].tile, Tile(3, 2, 7))
-        self.assertEquals(coords[12].image_spec.crop_bounds,
+        self.assertEqual(coords[8].tile, Tile(3, 7, 7))
+        self.assertEqual(coords[9].tile, Tile(3, 0, 7))
+        self.assertEqual(coords[10].tile, Tile(3, 1, 7))
+        self.assertEqual(coords[11].tile, Tile(3, 2, 7))
+        self.assertEqual(coords[12].tile, Tile(3, 7, 7))
+        self.assertEqual(coords[13].tile, Tile(3, 0, 7))
+        self.assertEqual(coords[14].tile, Tile(3, 1, 7))
+        self.assertEqual(coords[15].tile, Tile(3, 2, 7))
+        self.assertEqual(coords[12].image_spec.crop_bounds,
                           (254, 254, 256, 256))
-        self.assertEquals(coords[13].image_spec.crop_bounds,
+        self.assertEqual(coords[13].image_spec.crop_bounds,
                           (0, 254, 256, 256))
-        self.assertEquals(coords[14].image_spec.crop_bounds,
+        self.assertEqual(coords[14].image_spec.crop_bounds,
                           (0, 254, 256, 256))
-        self.assertEquals(coords[15].image_spec.crop_bounds,
+        self.assertEqual(coords[15].image_spec.crop_bounds,
                           (0, 254, 2, 256))
 
     def test_edge_516_botmid(self):
@@ -295,21 +295,21 @@ class CoordsGeneratorTest(unittest.TestCase):
         from zaloa import generate_coordinates_516
         tile = Tile(2, 1, 3)
         coords = generate_coordinates_516(tile)
-        self.assertEquals(coords[8].tile, Tile(3, 1, 7))
-        self.assertEquals(coords[9].tile, Tile(3, 2, 7))
-        self.assertEquals(coords[10].tile, Tile(3, 3, 7))
-        self.assertEquals(coords[11].tile, Tile(3, 4, 7))
-        self.assertEquals(coords[12].tile, Tile(3, 1, 7))
-        self.assertEquals(coords[13].tile, Tile(3, 2, 7))
-        self.assertEquals(coords[14].tile, Tile(3, 3, 7))
-        self.assertEquals(coords[15].tile, Tile(3, 4, 7))
-        self.assertEquals(coords[12].image_spec.crop_bounds,
+        self.assertEqual(coords[8].tile, Tile(3, 1, 7))
+        self.assertEqual(coords[9].tile, Tile(3, 2, 7))
+        self.assertEqual(coords[10].tile, Tile(3, 3, 7))
+        self.assertEqual(coords[11].tile, Tile(3, 4, 7))
+        self.assertEqual(coords[12].tile, Tile(3, 1, 7))
+        self.assertEqual(coords[13].tile, Tile(3, 2, 7))
+        self.assertEqual(coords[14].tile, Tile(3, 3, 7))
+        self.assertEqual(coords[15].tile, Tile(3, 4, 7))
+        self.assertEqual(coords[12].image_spec.crop_bounds,
                           (254, 254, 256, 256))
-        self.assertEquals(coords[13].image_spec.crop_bounds,
+        self.assertEqual(coords[13].image_spec.crop_bounds,
                           (0, 254, 256, 256))
-        self.assertEquals(coords[14].image_spec.crop_bounds,
+        self.assertEqual(coords[14].image_spec.crop_bounds,
                           (0, 254, 256, 256))
-        self.assertEquals(coords[15].image_spec.crop_bounds,
+        self.assertEqual(coords[15].image_spec.crop_bounds,
                           (0, 254, 2, 256))
 
     def test_edge_516_botright(self):
@@ -317,21 +317,21 @@ class CoordsGeneratorTest(unittest.TestCase):
         from zaloa import generate_coordinates_516
         tile = Tile(2, 3, 3)
         coords = generate_coordinates_516(tile)
-        self.assertEquals(coords[8].tile, Tile(3, 5, 7))
-        self.assertEquals(coords[9].tile, Tile(3, 6, 7))
-        self.assertEquals(coords[10].tile, Tile(3, 7, 7))
-        self.assertEquals(coords[11].tile, Tile(3, 0, 7))
-        self.assertEquals(coords[12].tile, Tile(3, 5, 7))
-        self.assertEquals(coords[13].tile, Tile(3, 6, 7))
-        self.assertEquals(coords[14].tile, Tile(3, 7, 7))
-        self.assertEquals(coords[15].tile, Tile(3, 0, 7))
-        self.assertEquals(coords[12].image_spec.crop_bounds,
+        self.assertEqual(coords[8].tile, Tile(3, 5, 7))
+        self.assertEqual(coords[9].tile, Tile(3, 6, 7))
+        self.assertEqual(coords[10].tile, Tile(3, 7, 7))
+        self.assertEqual(coords[11].tile, Tile(3, 0, 7))
+        self.assertEqual(coords[12].tile, Tile(3, 5, 7))
+        self.assertEqual(coords[13].tile, Tile(3, 6, 7))
+        self.assertEqual(coords[14].tile, Tile(3, 7, 7))
+        self.assertEqual(coords[15].tile, Tile(3, 0, 7))
+        self.assertEqual(coords[12].image_spec.crop_bounds,
                           (254, 254, 256, 256))
-        self.assertEquals(coords[13].image_spec.crop_bounds,
+        self.assertEqual(coords[13].image_spec.crop_bounds,
                           (0, 254, 256, 256))
-        self.assertEquals(coords[14].image_spec.crop_bounds,
+        self.assertEqual(coords[14].image_spec.crop_bounds,
                           (0, 254, 256, 256))
-        self.assertEquals(coords[15].image_spec.crop_bounds,
+        self.assertEqual(coords[15].image_spec.crop_bounds,
                           (0, 254, 2, 256))
 
 
@@ -355,9 +355,9 @@ class S3FetchTest(unittest.TestCase):
         s3_tile_fetcher = S3TileFetcher(stub_s3_client, bucket)
         from zaloa import Tile
         fetch_result = s3_tile_fetcher(tileset, Tile(3, 2, 1))
-        self.assertEquals('image data', fetch_result.image_bytes)
-        self.assertEquals('fake-bucket', stub_s3_client.kwargs['Bucket'])
-        self.assertEquals('terrarium/3/2/1.png', stub_s3_client.kwargs['Key'])
+        self.assertEqual('image data', fetch_result.image_bytes)
+        self.assertEqual('fake-bucket', stub_s3_client.kwargs['Bucket'])
+        self.assertEqual('terrarium/3/2/1.png', stub_s3_client.kwargs['Key'])
 
     def test_missing(self):
 
@@ -385,7 +385,7 @@ class S3FetchTest(unittest.TestCase):
         from zaloa import MissingTileException
         with self.assertRaises(MissingTileException) as cm:
             s3_tile_fetcher(tileset, Tile(3, 2, 1))
-        self.assertEquals(Tile(3, 2, 1), cm.exception.tile)
+        self.assertEqual(Tile(3, 2, 1), cm.exception.tile)
 
     def test_unknown_exception(self):
 
@@ -407,7 +407,7 @@ class S3FetchTest(unittest.TestCase):
         with self.assertRaises(Exception) as cm:
             s3_tile_fetcher(tileset, Tile(3, 2, 1))
         self.failIf(isinstance(cm.exception, MissingTileException))
-        self.assertEquals('unknown exception', cm.exception.message)
+        self.assertEqual('unknown exception', cm.exception.message)
 
 
 class HttpFetchTest(unittest.TestCase):
@@ -433,8 +433,8 @@ class HttpFetchTest(unittest.TestCase):
         http_tile_fetcher = HttpTileFetcher(stub_http_client, url_prefix)
         from zaloa import Tile
         fetch_result = http_tile_fetcher(tileset, Tile(3, 2, 1))
-        self.assertEquals('image data', fetch_result.image_bytes)
-        self.assertEquals(
+        self.assertEqual('image data', fetch_result.image_bytes)
+        self.assertEqual(
             'http://foo/terrarium/3/2/1.png', stub_http_client.url)
 
     def test_missing(self):
@@ -458,7 +458,7 @@ class HttpFetchTest(unittest.TestCase):
         from zaloa import MissingTileException
         with self.assertRaises(MissingTileException) as cm:
             http_tile_fetcher(tileset, Tile(3, 2, 1))
-        self.assertEquals(Tile(3, 2, 1), cm.exception.tile)
+        self.assertEqual(Tile(3, 2, 1), cm.exception.tile)
 
     def test_unknown_exception(self):
 
@@ -480,7 +480,7 @@ class HttpFetchTest(unittest.TestCase):
         with self.assertRaises(Exception) as cm:
             http_tile_fetcher(tileset, Tile(3, 2, 1))
         self.failIf(isinstance(cm.exception, MissingTileException))
-        self.assertEquals('unknown exception', cm.exception.message)
+        self.assertEqual('unknown exception', cm.exception.message)
 
 
 class ProcessTileTest(unittest.TestCase):
@@ -515,7 +515,7 @@ class ProcessTileTest(unittest.TestCase):
             Tile(0, 0, 0),
         )
 
-        self.assertEquals('combined image data', response)
+        self.assertEqual('combined image data', response)
 
     def _gen_stub_image(self, color):
         from PIL import Image
@@ -586,7 +586,7 @@ class ProcessTileTest(unittest.TestCase):
             for y in xrange(region_bounds[1], region_bounds[3]):
                 for x in xrange(region_bounds[0], region_bounds[2]):
                     pixel = im.getpixel((x, y))
-                    self.assertEquals(color, pixel)
+                    self.assertEqual(color, pixel)
 
     def test_validity_260(self):
         from zaloa import process_tile
@@ -656,7 +656,7 @@ class ProcessTileTest(unittest.TestCase):
             for y in xrange(region_bounds[1], region_bounds[3]):
                 for x in xrange(region_bounds[0], region_bounds[2]):
                     pixel = im.getpixel((x, y))
-                    self.assertEquals(color, pixel)
+                    self.assertEqual(color, pixel)
 
     def test_validity_516(self):
         from zaloa import process_tile
@@ -740,7 +740,7 @@ class ProcessTileTest(unittest.TestCase):
             for y in xrange(region_bounds[1], region_bounds[3]):
                 for x in xrange(region_bounds[0], region_bounds[2]):
                     pixel = im.getpixel((x, y))
-                    self.assertEquals(color, pixel)
+                    self.assertEqual(color, pixel)
 
 
 class ParsePathTest(unittest.TestCase):
@@ -762,7 +762,7 @@ class ParsePathTest(unittest.TestCase):
     def assert_not_found(self, path, reason):
         from zaloa import parse_apigateway_path
         parse_result = parse_apigateway_path(path)
-        self.assertEquals(reason, parse_result.not_found_reason)
+        self.assertEqual(reason, parse_result.not_found_reason)
 
     def test_invalid_tile_format(self):
         self.assert_not_found('512/terrarium/1/1/1.jpg', 'Invalid format')
