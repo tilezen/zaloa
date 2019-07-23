@@ -2,6 +2,7 @@ import logging
 import math
 import sys
 import time
+from auth import register_auth
 from collections import namedtuple
 from io import BytesIO
 from flask import Blueprint, Flask, current_app, make_response, render_template, request, abort
@@ -31,15 +32,10 @@ def create_app():
     CORS(app)
     cache.init_app(app)
 
-    @app.before_first_request
-    def setup_logging():
-        if not app.debug:
-            # In production mode, add log handler to sys.stderr.
-            app.logger.addHandler(logging.StreamHandler())
-            app.logger.setLevel(logging.INFO)
-
     fetch_type = app.config.get('TILES_FETCH_METHOD')
     assert fetch_type in ('s3', 'http'), "Fetch method must be s3 or http"
+
+    register_auth(app)
 
     app.register_blueprint(tile_bp)
 

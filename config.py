@@ -28,3 +28,7 @@ TILES_FETCH_METHOD = os.environ.get('TILES_FETCH_METHOD')
 TILES_S3_BUCKET = os.environ.get("TILES_S3_BUCKET")
 TILES_HTTP_PREFIX = os.environ.get("TILES_HTTP_PREFIX")
 REQUESTER_PAYS = os.environ.get("REQUESTER_PAYS", 'false') == 'true'
+
+APIKEY_METHOD = os.environ.get("APIKEY_METHOD")
+APIKEY_S3_BUCKET = os.environ.get('APIKEY_S3_BUCKET')
+APIKEY_S3_KEY_PREFIX = os.environ.get('APIKEY_S3_KEY_PREFIX')
