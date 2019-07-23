@@ -94,6 +94,10 @@ def handle_tile(z, x, y, tileset, tilesize=None):
 
     resp = make_response(image_bytes)
     resp.content_type = 'image/png'
+    resp.cache_control.public = True
+    resp.cache_control.max_age = current_app.config.get("CACHE_MAX_AGE")
+    if current_app.config.get("SHARED_CACHE_MAX_AGE"):
+        resp.cache_control.s_maxage = current_app.config.get("SHARED_CACHE_MAX_AGE")
     return resp
 
 
